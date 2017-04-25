@@ -23,70 +23,18 @@ void rag_request(int pid, int lockid) {
     // compare the pid-parameter with the curr_adj_node->id
     // if we've found a match, traverse the list
     if (pid == curr_adj_node->id){
-
-      // we've found a matching process, so traverse the list & append a new lockid-node
-      while (curr_adj_node != NULL){
-        // do stuff
-        if (curr_adj_node->nextNode == NULL){ /*if this is the last node*/
-          // append the new lockid-node to the list as curr_adj_node->nextNode
-          struct adjListNode *insert_node; // = {id:lockid, }
-          insert_node->id = lockid;
-          insert_node->isLock = 1;
-          insert_node->nextNode = NULL;
-          curr_adj_node->nextNode = insert_node;
-
-          break;
-        }
-
-        // current node isn't the last, so move to the next node
-        curr_adj_node = curr_adj_node->nextNode;
-      }
+      // add node to the list & return
+      addNodeToList(curr_node_list, lockid, 1);
+      return;
     }
-
     // move to the next list
     curr_node_list = curr_node_list->nextList;
   }
 
   // if there isn't a head
   // also accomodate if we loop through and can't find a matching process
-  struct nodeList *insert_list = malloc(sizeof(struct nodeList));
-  insert_list->nextList = A->head; // make the next list the old head
-  A->head = insert_list;
-
-
-
-
-  // else /* can't find a matching process in the graph*/{
-  //   // append a new list to the end of the graph...
-  //   struct nodeList *insert_list;
-  //   curr_node_list->nextList = insert_list;
-  //   curr_node_list->nextList->nextList = NULL;
-  //
-  //   // create a new head node for the newly appended list
-  //   // where the head node's id matches the pid-parameter
-  //   struct adjListNode *insert_node; // = {id:lockid, }
-  //   curr_node_list->nextList->headNode = insert_node;
-  //   curr_node_list->nextList->headNode->id = pid;
-  //   curr_node_list->nextList->headNode->isLock = 0;
-  //
-  //   // append the lock node to the end of the list
-  //   struct adjListNode *insert_lock_node;
-  //   curr_node_list->nextList->headNode->nextNode = insert_lock_node;
-  //   curr_node_list->nextList->headNode->nextNode->id = lockid;
-  //   curr_node_list->nextList->headNode->nextNode->isLock = 1;
-  //   curr_node_list->nextList->headNode->nextNode->nextNode = NULL;
-  //
-  //   curr_adj_node->nextNode = insert_node;
-  //   curr_adj_node->nextNode->id = lockid;
-  //   curr_adj_node->nextNode->isLock = 1;
-  //   curr_adj_node->nextNode->nextNode = NULL;
-  //   break;
-  //
-  //   // finally, append a new node to the end of the list...
-  //   // where the newly appended node has an id corresponding to the lockid-parameter
-  // }
-
-
+  addNodeList(pid, 0);
+  addNodeToList(A->head, lockid, 1);
 }
 
 void rag_alloc(int pid, int lockid) {
@@ -157,25 +105,10 @@ void reqFind(int pid, char req, int lockid) {
 }
 
 int main(int argc, char** argv) {
-  // A = malloc(sizeof(struct adjListNode)*(NLOCK+1) * NPROC);
-  // A = malloc(sizeof(struct adjListNode)*)
-  // A = malloc(sizeof(struct AdjList));
+  // initialize the adj list
   initAdjList();
-  struct adjListNode *n;
-  addNodeList(5,5);
 
-
-
-  struct nodeList *nl = malloc(sizeof(struct nodeList));
-  // struct adjListNode
-  nl->headNode = n;
-  addNodeToList(nl,5,5);
-
-
-
-  // printf("%s\n", );
-
-
+  // read in file
   FILE *file = fopen("./input.txt","r");
   char line[7];
 
@@ -189,9 +122,7 @@ int main(int argc, char** argv) {
     req = line[2];
     lockid = line[4];
 
-
-
-    // reqFind(pid, req, lockid);
+    reqFind(pid, req, lockid);
   }
   deadlock_detect();
 }
