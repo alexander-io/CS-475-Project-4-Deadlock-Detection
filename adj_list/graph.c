@@ -37,8 +37,39 @@ void rag_request(int pid, int lockid) {
   addNodeToList(A->head, lockid, 1);
 }
 
+
+// add allocation edge from lockid to pid
+// remove request edge from pid to lockid
 void rag_alloc(int pid, int lockid) {
 
+  // set temporary "head" variables so we can traverse
+  struct nodeList *curr_node_list = A->head;
+  struct adjListNode *curr_adj_node;
+
+  // traverse the adj-list if node-lists exist
+  while (curr_node_list != NULL){
+
+    // set current node to head of list
+    curr_adj_node = curr_node_list->headNode;
+
+    // compare the pid-parameter with the curr_adj_node->id
+    // if we've found a match, traverse the list
+    if (lockid == curr_adj_node->id){
+      // add node to the list & return
+      addNodeToList(curr_node_list, lockid, 0);
+      return;
+    }
+    // move to the next list
+    curr_node_list = curr_node_list->nextList;
+  }
+
+  // if there isn't a head
+  addNodeList(lockid, 1);
+  addNodeToList(A->head, pid, 0);
+
+
+  // remove request edge from pid to lockid
+  removeReqEdge(pid, lockid);
 }
 
 void rag_dealloc(int pid, int lockid) {
@@ -87,6 +118,39 @@ void addNodeToList(struct nodeList *curr_node_list, int new_node_id, int isLock)
   insert_node->nextNode = curr_node_list->headNode->nextNode;
   // curr_node_list->headNode->nextNode = insert_node;
 }
+
+// remove request edge from pid->lockid
+void removeReqEdge(int pid, int lockid){
+  struct nodeList *curr_list = A->head;
+  struct adjListNode *curr_node;
+
+  while (curr_list!=NULL) {
+
+    if (curr_list->headNode->id == pid){
+
+      //
+      curr_node = curr_list->headNode;
+
+      // loop through node in list
+      while (curr_node->nextNode!=NULL) {
+
+        // if the next node is a match, remove the next node
+        if (curr_node->nextNode->id == lockid) {
+          struct adjListNode *remove_node = curr_node->nextNode;
+          // this is the node we want to remove
+          curr_node->nextNode = curr_node->nextNode->nextNode;
+          free(remove_node);
+
+        }
+        // move on to check the next node
+        curr_node = curr_node->nextNode;
+      }
+    }
+    // move to the next list
+    curr_list = curr_list->nextList;
+  }
+}
+
 
 
 void reqFind(int pid, char req, int lockid) {
