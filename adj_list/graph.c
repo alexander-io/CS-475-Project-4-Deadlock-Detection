@@ -77,8 +77,8 @@ void rag_dealloc(int pid, int lockid) {
 }
 
 void rag_print() {
-  struct nodeList currL = A->head;
-  struct adjListNode currN = A->head->headNode;
+  struct nodeList *currL = A->head;
+  struct adjListNode *currN = A->head->headNode;
 
   while(currL!=NULL) {
     while(currN!=NULL) {
@@ -138,11 +138,12 @@ void removeReqEdge(int pid, int lockid){
   struct nodeList *curr_list = A->head;
   struct adjListNode *curr_node;
 
+  // loop through the lists
   while (curr_list!=NULL) {
-
+    // if we've found a list with a maching headnode->id
     if (curr_list->headNode->id == pid){
 
-      //
+      // set the current node to the head of the list
       curr_node = curr_list->headNode;
 
       // loop through node in list
@@ -154,7 +155,6 @@ void removeReqEdge(int pid, int lockid){
           // this is the node we want to remove
           curr_node->nextNode = curr_node->nextNode->nextNode;
           free(remove_node);
-
         }
         // move on to check the next node
         curr_node = curr_node->nextNode;
@@ -166,10 +166,12 @@ void removeReqEdge(int pid, int lockid){
 }
 
 
-
+// take in the instruction as a paremeter, call the appropriate functions :
+// rag_request
+// rag_alloc
+// rag_dealloc
 void reqFind(int pid, char req, int lockid) {
   switch (req) {
-
     case 'R':
       rag_request(pid, lockid);
       break;
@@ -188,19 +190,49 @@ int main(int argc, char** argv) {
 
   // read in file
   FILE *file = fopen("./input.txt","r");
-  char line[7];
+  char line[21];
 
   int pid;
   int lockid;
 
+  char *token;
+
   while(fgets(line, sizeof(line), file)) {
-    char req;
 
-    pid = line[0];
-    req = line[2];
-    lockid = line[4];
+    char req[1];
 
-    reqFind(pid, req, lockid);
+
+    int counter = 0;
+
+    token = strtok(line, ",\n");
+    while (token!=NULL) {
+
+      switch(counter){
+        case 0:
+          pid = atoi(token);
+          break;
+
+        case 1:
+          strcpy(req, token);
+          // req = token;
+          break;
+
+        case 2:
+          lockid = atoi(token);
+          break;
+
+      }
+      ++counter;
+      // printf("%s\n", token);
+      token = strtok(NULL, ",\n");
+    }
+    counter=0;
+
+    // printf("%d,%c,%d\n", pid, (*req), lockid);
+
+
+    reqFind(pid, (*req), lockid);
+    rag_print();
   }
   deadlock_detect();
 }
