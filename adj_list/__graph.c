@@ -105,11 +105,11 @@ void rag_print() {
     ////////////
     printf("\n");
     // printf("print2() a head id : %d\n", A->head->headNode->id);
-    // printf("print2() a head id : %d\n", currL->headNode->id);
-    //
-    // if (currL->nextList!=NULL)
-    //   // printf("print2() head next id : %d\n", A->head->nextList->headNode->id);
-    //   printf("print2() head next id : %d\n", currL->nextList->headNode->id);
+    printf("print2() a head id : %d\n", currL->headNode->id);
+
+    if (currL->nextList!=NULL)
+      // printf("print2() head next id : %d\n", A->head->nextList->headNode->id);
+      printf("print2() head next id : %d\n", currL->nextList->headNode->id);
 
     currL = currL->nextList;
   }
