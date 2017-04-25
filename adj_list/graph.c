@@ -24,6 +24,7 @@ void rag_request(int pid, int lockid) {
     // if we've found a match, traverse the list
     if (pid == curr_adj_node->id){
       // add node to the list & return
+
       addNodeToList(curr_node_list, lockid, 1);
       return;
     }
@@ -33,6 +34,7 @@ void rag_request(int pid, int lockid) {
 
   // if there isn't a head
   // also accomodate if we loop through and can't find a matching process
+  // printf("%s\n", );
   addNodeList(pid, 0);
   addNodeToList(A->head, lockid, 1);
 }
@@ -86,7 +88,6 @@ void rag_print() {
         printf("lockid=%d ", currN->id);
       else
         printf("pid=%d ", currN->id);
-
       currN = currN->nextNode;
     }
     printf("\n");
@@ -130,7 +131,14 @@ void addNodeToList(struct nodeList *curr_node_list, int new_node_id, int isLock)
   insert_node->isLock = isLock;
   // // unlink head-> next_node, place in head->insert->next_node
   insert_node->nextNode = curr_node_list->headNode->nextNode;
-  // curr_node_list->headNode->nextNode = insert_node;
+  curr_node_list->headNode->nextNode = insert_node;
+
+  struct adjListNode *print_node = curr_node_list->headNode;
+  // while (print_node!=NULL){
+  //   printf("id : %d\n", print_node->id);
+  //   print_node = print_node->nextNode;
+  // }
+
 }
 
 // remove request edge from pid->lockid
@@ -230,9 +238,8 @@ int main(int argc, char** argv) {
 
     // printf("%d,%c,%d\n", pid, (*req), lockid);
 
-
     reqFind(pid, (*req), lockid);
-    rag_print();
   }
+  rag_print();
   deadlock_detect();
 }
