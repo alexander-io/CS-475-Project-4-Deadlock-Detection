@@ -46,7 +46,21 @@ void rag_dealloc(int pid, int lockid) {
 }
 
 void rag_print() {
+  struct nodeList currL = A->head;
+  struct adjListNode currN = A->head->headNode;
 
+  while(currL!=NULL) {
+    while(currN!=NULL) {
+      if (currN->isLock)
+        printf("lockid=%d ", currN->id);
+      else
+        printf("pid=%d ", currN->id);
+
+      currN = currN->nextNode;
+    }
+    printf("\n");
+    currL = currL->nextList;
+  }
 }
 
 void deadlock_detect(void) {
