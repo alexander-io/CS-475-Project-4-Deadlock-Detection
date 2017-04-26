@@ -34,10 +34,8 @@ void rag_request(int pid, int lockid) {
 
   // if there isn't a head
   // also accomodate if we loop through and can't find a matching process
-  // printf("%s\n", );
   addNodeList(pid, 0);
   addNodeToList(A->head, lockid, 1);
-  // printf(">> pid=%d requests lockid=%d\n", pid,lockid);
 }
 
 
@@ -71,11 +69,8 @@ void rag_alloc(int pid, int lockid) {
   addNodeList(lockid, 1);
   addNodeToList(A->head, pid, 0);
 
-
   // remove request edge from pid to lockid
   removeReqEdge(pid, lockid);
-  // printf("just removed req edge\n"); // XXX test print
-  // printf(">> pid=%d aquires lockid=%d\n", pid,lockid);
 }
 
 void rag_dealloc(int pid, int lockid) {
@@ -104,7 +99,6 @@ void rag_dealloc(int pid, int lockid) {
             curr_node->nextNode = remove_node->nextNode;
           }
           // remove_node
-          // printf("about to free\n"); // XXX test print
           free(remove_node);
           return;
         }
@@ -115,23 +109,18 @@ void rag_dealloc(int pid, int lockid) {
     // move to the next list
     curr_list = curr_list->nextList;
   }
-  // printf(">> pid=%d releases lockid=%d\n", pid,lockid);
 }
 
+/*
+* print the resource allocation graph
+*/
 void rag_print() {
-
-  // printf("print() a head id : %d\n", A->head->headNode->id);
-  // if (A->head->nextList!=NULL)
-  //   printf("print() head next id : %d\n", A->head->nextList->headNode->id);
-
-
   struct nodeList *currL = A->head;
   // struct adjListNode *currN = A->head->headNode;
   struct adjListNode *currN;
 
   while(currL!=NULL) {
     currN = currL->headNode;
-    ///////
     while(currN!=NULL) {
 
       if (currN->isLock)
@@ -142,19 +131,12 @@ void rag_print() {
       currN = currN->nextNode;
 
     }
-    ////////////
     printf("\n");
-    // printf("print2() a head id : %d\n", A->head->headNode->id);
-    // printf("print2() a head id : %d\n", currL->headNode->id);
-    //
-    // if (currL->nextList!=NULL)
-    //   // printf("print2() head next id : %d\n", A->head->nextList->headNode->id);
-    //   printf("print2() head next id : %d\n", currL->nextList->headNode->id);
-
     currL = currL->nextList;
   }
 }
 
+// detect deadlock in the graph
 void deadlock_detect(void) {
 
 }
@@ -177,23 +159,10 @@ void addNodeList(int head_node_id, int isLock){
 
   // set the head of the new list to be the new node
   new_list->headNode = new_node;
-  // printf("~~~~~~~~~\n");
-  // rag_print();
-  // link the new head and the old head
 
   struct nodeList *nl = A->head;
   A->head = new_list;
   new_list->nextList = nl;
-
-  // new_list->nextList = A->head;
-
-  // new_list->nextList = &(A->head);
-
-  // A->head->nextList = &nl;
-  // printf("|||||||||||");
-  // rag_print();
-
-
 }
 
 // add node
@@ -202,11 +171,9 @@ void addNodeToList(struct nodeList *curr_node_list, int new_node_id, int isLock)
   struct adjListNode *insert_node = malloc(sizeof(struct adjListNode));
   insert_node->id = new_node_id;
   insert_node->isLock = isLock;
-  // // unlink head-> next_node, place in head->insert->next_node
+
   insert_node->nextNode = curr_node_list->headNode->nextNode;
   curr_node_list->headNode->nextNode = insert_node;
-
-
 }
 
 // remove request edge from pid->lockid
@@ -230,12 +197,11 @@ void removeReqEdge(int pid, int lockid){
           // this is the node we want to remove
           struct adjListNode *remove_node = curr_node->nextNode;
           curr_node->nextNode = NULL;
-
+          // if there's another node down the list, link it up
           if(remove_node->nextNode!=NULL){
             curr_node->nextNode = remove_node->nextNode;
           }
           // remove_node
-          // printf("about to free\n"); // XXX test print
           free(remove_node);
           return;
         }
@@ -305,12 +271,9 @@ int main(int argc, char** argv) {
 
       }
       ++counter;
-      // printf("%s\n", token);
       token = strtok(NULL, ",\n");
     }
     counter=0;
-
-    // printf("%d,%c,%d\n", pid, (*req), lockid);
 
     reqFind(pid, (*req), lockid);
   }
