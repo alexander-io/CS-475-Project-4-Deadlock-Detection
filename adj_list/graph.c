@@ -20,7 +20,7 @@ void rag_request(int pid, int lockid) {
     // set current node to head of list
     curr_adj_node = curr_node_list->headNode;
 
-    // compare the pid-parameter with the curr_adj_node->id
+    // compare the pid-parmakeameter with the curr_adj_node->id
     // if we've found a match, traverse the list
     if (pid == curr_adj_node->id && !curr_adj_node->isLock){
       // add node to the list & return
@@ -237,7 +237,7 @@ int main(int argc, char** argv) {
   initAdjList();
 
   // read in file
-  FILE *file = fopen("./input2.txt","r");
+  FILE *file = fopen("./input.txt","r");
   char line[21];
 
   int pid;
