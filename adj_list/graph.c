@@ -4,8 +4,13 @@
 #include "graph.h"
 
 struct AdjList *A;
+
+struct AdjList *ParentList; // helper list for deadlock detection
+
 int NLOCK = 10;
 int NPROC = 20;
+
+int recursive_deadlock_detect();
 
 // add request edge for the rag from PID to lock id
 void rag_request(int pid, int lockid) {
@@ -37,7 +42,6 @@ void rag_request(int pid, int lockid) {
   addNodeList(pid, 0);
   addNodeToList(A->head, lockid, 1);
 }
-
 
 // add allocation edge from lockid to pid
 // remove request edge from pid to lockid
@@ -138,7 +142,44 @@ void rag_print() {
 
 // detect deadlock in the graph
 void deadlock_detect(void) {
+  struct nodeList *curr_list = A->head;
 
+  // make a list of head nodes
+  struct nodeList *list_of_head_nodes = malloc(sizeof(struct nodeList));// = malloc(sizeof(adjListNode*)*number_of_head_nodes?????);
+
+
+  while (curr_list!=NULL){
+
+    //
+    if (list_of_head_nodes->headNode==NULL){
+      // we aren't using the addNodeList function that adds the head node for us, so do it manually...
+      list_of_head_nodes->headNode = A->head->headNode;
+    } else {
+      // addNodeToList the head node of each list, append to list_of_head_nodes
+      addNodeToList(list_of_head_nodes, curr_list->headNode->id, curr_list->headNode->isLock);
+    }
+
+    // move to the nxt list
+    curr_list = curr_list->nextList;
+  }
+
+
+  free(list_of_head_nodes);
+
+
+
+  printf("calling deadlock detect\n");
+
+  recursive_deadlock_detect(curr_list->headNode);
+
+}
+
+/*
+* recursive call for deadlock detection
+* @return int/boolean, 0 : no-cycle , 1 : cycle
+*/
+int recursive_deadlock_detect(struct adjListNode *head_node){
+  return 0;
 }
 
 // init adj list
@@ -215,7 +256,7 @@ void removeReqEdge(int pid, int lockid){
 }
 
 
-// take in the instruction as a paremeter, call the appropriate functions :
+// take in the instruction as a parameter, call the appropriate functions :
 // rag_request
 // rag_alloc
 // rag_dealloc
