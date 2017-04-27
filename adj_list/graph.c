@@ -5,7 +5,7 @@
 
 struct AdjList *A;
 
-struct AdjList *ParentList; // helper list for deadlock detection
+struct AdjList *whiteList; // helper list for deadlock detection
 
 int NLOCK = 10;
 int NPROC = 20;
@@ -145,18 +145,18 @@ void deadlock_detect(void) {
   struct nodeList *curr_list = A->head;
 
   // make a list of head nodes
-  struct nodeList *list_of_head_nodes = malloc(sizeof(struct nodeList));// = malloc(sizeof(adjListNode*)*number_of_head_nodes?????);
-
-
+  // struct nodeList *list_of_head_nodes = malloc(sizeof(struct nodeList));// = malloc(sizeof(adjListNode*)*number_of_head_nodes?????);
+  whiteList = malloc(sizeof(struct nodeList));
+  whiteList->headNode->id = -1;
   while (curr_list!=NULL){
 
     //
-    if (list_of_head_nodes->headNode==NULL){
+    if (whiteList->headNode==NULL){
       // we aren't using the addNodeList function that adds the head node for us, so do it manually...
-      list_of_head_nodes->headNode = A->head->headNode;
+      whiteList->headNode = A->head->headNode;
     } else {
       // addNodeToList the head node of each list, append to list_of_head_nodes
-      addNodeToList(list_of_head_nodes, curr_list->headNode->id, curr_list->headNode->isLock);
+      addNodeToList(whiteList, curr_list->headNode->id, curr_list->headNode->isLock);
     }
 
     // move to the nxt list
@@ -178,7 +178,7 @@ void deadlock_detect(void) {
 * recursive call for deadlock detection
 * @return int/boolean, 0 : no-cycle , 1 : cycle
 */
-int recursive_deadlock_detect(struct adjListNode *head_node){
+int recursive_deadlock_detect(struct adjListNode *head_node, ){
   return 0;
 }
 
