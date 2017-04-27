@@ -4,8 +4,7 @@
 #include "graph.h"
 
 struct AdjList *A;
-
-struct AdjList *whiteList; // helper list for deadlock detection
+struct nodeList *whiteList, *greyList, *blackList; // helper list for deadlock detection
 
 int NLOCK = 10;
 int NPROC = 20;
@@ -146,31 +145,39 @@ void deadlock_detect(void) {
 
   // make a list of head nodes
   // struct nodeList *list_of_head_nodes = malloc(sizeof(struct nodeList));// = malloc(sizeof(adjListNode*)*number_of_head_nodes?????);
-  whiteList = malloc(sizeof(struct nodeList));
-  whiteList->headNode->id = -1;
-  while (curr_list!=NULL){
+  struct adjListNode *temp = malloc(sizeof(struct adjListNode));
+  temp->id=-1;
+  whiteList->headNode = temp;
 
-    //
-    if (whiteList->headNode==NULL){
-      // we aren't using the addNodeList function that adds the head node for us, so do it manually...
-      whiteList->headNode = A->head->headNode;
-    } else {
-      // addNodeToList the head node of each list, append to list_of_head_nodes
-      addNodeToList(whiteList, curr_list->headNode->id, curr_list->headNode->isLock);
-    }
+  while (curr_list!=NULL){
+    printf(">> in here\n");
+
+    // addNodeToList the head node of each list, append to list_of_head_nodes
+    addNodeToList(whiteList, curr_list->headNode->id, curr_list->headNode->isLock);
 
     // move to the nxt list
     curr_list = curr_list->nextList;
   }
 
-
-  free(list_of_head_nodes);
-
-
+  whiteList->headNode = temp->nextNode;
+  free(temp);
 
   printf("calling deadlock detect\n");
 
-  recursive_deadlock_detect(curr_list->headNode);
+  // recursive_deadlock_detect(curr_list->headNode);
+
+
+  //////////////////////////
+  struct adjListNode *whiteListy = whiteList->headNode;
+  while(whiteListy!=NULL) {
+    if (whiteListy->isLock)
+      printf("lockid=%d ", whiteListy->id);
+    else
+      printf("pid=%d ", whiteListy->id);
+    whiteListy = whiteListy->nextNode;
+  }
+  printf("\n");
+  free(whiteList);
 
 }
 
@@ -178,12 +185,13 @@ void deadlock_detect(void) {
 * recursive call for deadlock detection
 * @return int/boolean, 0 : no-cycle , 1 : cycle
 */
-int recursive_deadlock_detect(struct adjListNode *head_node, ){
+int recursive_deadlock_detect(struct adjListNode *head_node){
   return 0;
 }
 
 // init adj list
 void initAdjList(){
+  whiteList = malloc(sizeof(struct nodeList));
   A = malloc(sizeof(struct AdjList));
 }
 
