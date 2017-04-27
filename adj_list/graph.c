@@ -223,12 +223,15 @@ void reqFind(int pid, char req, int lockid) {
   switch (req) {
     case 'R':
       rag_request(pid, lockid);
+      printf("pid=%d (R) requests lockid=%d\n", pid,lockid);
       break;
     case 'A':
       rag_alloc(pid, lockid);
+      printf("pid=%d (A) aquires lockid=%d\n", pid,lockid);
       break;
     case 'D':
       rag_dealloc(pid, lockid);
+      printf("pid=%d (D) releases lockid=%d\n", pid,lockid);
       break;
   }
 }
