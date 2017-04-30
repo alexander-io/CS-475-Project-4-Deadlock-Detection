@@ -142,42 +142,16 @@ void rag_print() {
 // detect deadlock in the graph
 void deadlock_detect(void) {
   struct nodeList *curr_list = A->head;
+  struct linkedlist* linkedlist = malloc(size(struct linkedlist))
+  // printList
 
-  // make a list of head nodes
-  // struct nodeList *list_of_head_nodes = malloc(sizeof(struct nodeList));// = malloc(sizeof(adjListNode*)*number_of_head_nodes?????);
-  struct adjListNode *temp = malloc(sizeof(struct adjListNode));
-  temp->id=-1;
-  whiteList->headNode = temp;
+  // // recursive_deadlock_detect(curr_list->headNode);
 
-  while (curr_list!=NULL){
-    printf(">> in here\n");
+  // //////////////////////////
+  // struct adjListNode *whiteListy = whiteList->headNode;
 
-    // addNodeToList the head node of each list, append to list_of_head_nodes
-    addNodeToList(whiteList, curr_list->headNode->id, curr_list->headNode->isLock);
-
-    // move to the nxt list
-    curr_list = curr_list->nextList;
-  }
-
-  whiteList->headNode = temp->nextNode;
-  free(temp);
-
-  printf("calling deadlock detect\n");
-
-  // recursive_deadlock_detect(curr_list->headNode);
-
-
-  //////////////////////////
-  struct adjListNode *whiteListy = whiteList->headNode;
-  while(whiteListy!=NULL) {
-    if (whiteListy->isLock)
-      printf("lockid=%d ", whiteListy->id);
-    else
-      printf("pid=%d ", whiteListy->id);
-    whiteListy = whiteListy->nextNode;
-  }
-  printf("\n");
-  free(whiteList);
+  // printf("\n");
+  // free(whiteList);
 
 }
 
