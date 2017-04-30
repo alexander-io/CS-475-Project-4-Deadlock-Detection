@@ -4,7 +4,7 @@
 #include "graph.h"
 
 struct AdjList *A;
-struct linkedlist *whiteList, *greyList, *blackList, *parentMap; // helper list for deadlock detection
+struct linkedlist *whiteList, *greyList, *blackList; // helper list for deadlock detection
 
 int NLOCK = 10;
 int NPROC = 20;
@@ -227,7 +227,6 @@ void initAdjList(){
   whiteList = malloc(sizeof(struct linkedlist));
   greyList = malloc(sizeof(struct linkedlist));
   blackList = malloc(sizeof(struct linkedlist));
-  parentMap = malloc(sizeof(struct linkedlist));
   A = malloc(sizeof(struct AdjList));
 }
 
@@ -317,6 +316,20 @@ void reqFind(int pid, char req, int lockid) {
   }
 }
 
+// free global lists
+void freeGlobals(){
+  freeLinkedList(whiteList);
+  freeLinkedList(greyList);
+  freeLinkedList(blackList);
+  free(whiteList);
+  free(greyList);
+  free(blackList);
+
+  freeAdjList(A);
+  free(A);
+}
+
+
 int main(int argc, char** argv) {
   // initialize the adj list
   initAdjList();
@@ -357,4 +370,5 @@ int main(int argc, char** argv) {
   }
   rag_print();
   deadlock_detect();
+  freeGlobals();
 }

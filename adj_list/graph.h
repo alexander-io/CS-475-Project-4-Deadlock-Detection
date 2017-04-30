@@ -22,20 +22,51 @@ struct linkedlist {
   struct adjListNode* linkHead;
 };
 
-// void freeNodeList() {
-//
-// }
-// void freeAdjList(struct AdjList* alist){
-//   struct
-// }
+// free node list
+void freeNodeList(struct nodeList* nlist) {
+  struct adjListNode* toFree = nlist->headNode;
+  if (toFree == NULL) return;
 
-void freeLinkedList(struct linkedlist* list) {
-  struct adjListNode* toFree = list->linkHead;
   struct adjListNode* nextNode = toFree->nextNode;
 
-  if(nextNode == NULL) {
+  if(nextNode == NULL) free(toFree);
+
+  while (nextNode != NULL) {
+    free(toFree);
+    toFree = nextNode;
+    nextNode = toFree->nextNode;
+  }
+}
+
+// free adj list
+void freeAdjList(struct AdjList* alist){
+  struct nodeList* toFree = alist->head;
+
+  if (toFree == NULL)return;
+
+  struct nodeList* secondList = toFree->nextList;
+
+  if (secondList == NULL){
+    freeNodeList(toFree);
     free(toFree);
   }
+
+  while (secondList!=NULL){
+    freeNodeList(toFree);
+    free(toFree);
+    toFree = secondList;
+    secondList = toFree->nextList;
+  }
+}
+
+// free linked list
+void freeLinkedList(struct linkedlist* list) {
+  struct adjListNode* toFree = list->linkHead;
+  if (toFree == NULL) return;
+
+  struct adjListNode* nextNode = toFree->nextNode;
+
+  if(nextNode == NULL) free(toFree);
 
   while (nextNode != NULL) {
     free(toFree);
@@ -98,7 +129,6 @@ void printList(struct linkedlist* list){
     currNode = currNode->nextNode;
   }
 }
-
 
 void rag_request(int pid, int lockid);
 void removeReqEdge(int pid, int lockid);
