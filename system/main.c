@@ -65,7 +65,7 @@ void	philosopher(uint32 phil_id)
 
 				mutex_unlock(&locks[right]);
 			}
-			mutex_unlock(&locks[left])
+			mutex_unlock(&locks[left]);
 		} else {
 
 			mutex_lock(&print_lock[0]);
