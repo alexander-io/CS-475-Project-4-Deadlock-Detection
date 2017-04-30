@@ -184,7 +184,7 @@ static	void	sysinit(void)
 
 	/* loop through each element in the lock table, and initialize all data members */
 	for(i=0;i<NLOCK;i++){
-
+		// make each locktab entry point to a new wait queue
 		struct queue *newqueue = malloc(sizeof(struct queue));
 
 		locktab[i].state = LOCK_FREE;
