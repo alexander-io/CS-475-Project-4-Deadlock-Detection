@@ -4,12 +4,11 @@
 #include "graph.h"
 
 struct AdjList *A;
-struct linkedlist *whiteList, *greyList, *blackList; // helper list for deadlock detection
+struct linkedlist *whiteList, *greyList, *blackList, *parentMap; // helper list for deadlock detection
 
 int NLOCK = 10;
 int NPROC = 20;
 
-int recursive_deadlock_detect();
 
 // add request edge for the rag from PID to lock id
 void rag_request(int pid, int lockid) {
@@ -143,13 +142,25 @@ void rag_print() {
 void deadlock_detect(void) {
   struct nodeList *curr_list = A->head;
 
-  // // recursive_deadlock_detect(curr_list->headNode);
+  //add all the head nodes into a linked list
+  while(curr_list != NULL) {
+    push(curr_list->headNode->id,curr_list->headNode->isLock, whiteList);
+    curr_list = curr_list->nextList;
+  }
+  curr_list = NULL;
 
-  // //////////////////////////
-  // struct adjListNode *whiteListy = whiteList->headNode;
+  //traverse the white list, for each node add it to the grey list
+  struct adjListNode* currWhitelistNode = whiteList->linkHead;
+  while(currWhitelistNode != NULL) {
+    curr_list = getAdjList(currWhitelistNode);
+    struct adjListNode* currNode = curr_list->headNode;
 
-  // printf("\n");
-  // free(whiteList);
+    struct adjListNode* dfs = pull(currNode,whiteList);
+    push(dfs->id, dfs->isLock,greyList);
+    recursive_deadlock_detect(dfs);
+
+    currWhitelistNode = currWhitelistNode->nextNode;
+  }
 
 }
 
@@ -157,8 +168,45 @@ void deadlock_detect(void) {
 * recursive call for deadlock detection
 * @return int/boolean, 0 : no-cycle , 1 : cycle
 */
-int recursive_deadlock_detect(struct adjListNode *head_node){
+int recursive_deadlock_detect(struct adjListNode *dfsNode){
+  struct nodeList* traversalNodeList = getAdjList(dfsNode);
+  struct adjListNode* currNode = traversalNodeList->headNode->nextNode;
+  printf("start rec call\n");
+  while(currNode != NULL){
+    printf("in while\n");
+    if(contains(currNode,blackList)) {
+      printf("herererere\n");
+      continue;
+    } else if(contains(currNode,greyList)) {
+      printf("wee ooo wee ooo cycle detected\n");
+      return 1;
+    } else {
+      printf("stuck in white\n");
+      struct adjListNode* tmpNode = pull(currNode,whiteList);
+      push(tmpNode->id, tmpNode->isLock,greyList);
+      printf("before rec call\n");
+      recursive_deadlock_detect(currNode);
+    }
+    currNode = currNode->nextNode;
+  }
+  printf("skipping\n");
+  struct adjListNode* tmpNode = pull(dfsNode,greyList);
+  push(tmpNode->id, tmpNode->isLock,blackList);
   return 0;
+}
+
+struct nodeList* getAdjList(struct adjListNode* nodeToFind) {
+  struct nodeList* curr_list = A->head;
+
+  while(curr_list != NULL) {
+    //found the node to find as in our adj list
+    if(curr_list->headNode->id == nodeToFind->id && curr_list->headNode->isLock == nodeToFind->isLock){
+      return curr_list;
+    }
+    curr_list = curr_list->nextList;
+  }
+  //did not find the node to find
+  return NULL;
 }
 
 // init adj list
@@ -166,6 +214,7 @@ void initAdjList(){
   whiteList = malloc(sizeof(struct linkedlist));
   greyList = malloc(sizeof(struct linkedlist));
   blackList = malloc(sizeof(struct linkedlist));
+  parentMap = malloc(sizeof(struct linkedlist));
   A = malloc(sizeof(struct AdjList));
 }
 
@@ -232,16 +281,12 @@ void removeReqEdge(int pid, int lockid){
         curr_node = curr_node->nextNode;
       }
     }
-    // move to the next list
-    curr_list = curr_list->nextList;
+    curr_list = curr_list->nextList; // move to the next list
   }
 }
 
 
-// take in the instruction as a parameter, call the appropriate functions :
-// rag_request
-// rag_alloc
-// rag_dealloc
+// take in the instruction as a parameter, call the appropriate functions
 void reqFind(int pid, char req, int lockid) {
   switch (req) {
     case 'R':
@@ -264,18 +309,16 @@ int main(int argc, char** argv) {
   initAdjList();
 
   // read in file
-  FILE *file = fopen("./input.txt","r");
+  FILE *file = fopen("./input2.txt","r");
   char line[21];
 
   int pid;
   int lockid;
-
   char *token;
 
   while(fgets(line, sizeof(line), file)) {
 
     char req[1];
-
     int counter = 0;
 
     token = strtok(line, ",\n");
@@ -285,16 +328,12 @@ int main(int argc, char** argv) {
         case 0:
           pid = atoi(token);
           break;
-
         case 1:
           strcpy(req, token);
-          // req = token;
           break;
-
         case 2:
           lockid = atoi(token);
           break;
-
       }
       ++counter;
       token = strtok(NULL, ",\n");
