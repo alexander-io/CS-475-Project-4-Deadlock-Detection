@@ -1,5 +1,4 @@
 /* xinu.h - include all system header files */
-
 #include "kernel.h"
 #include "conf.h"
 #include "process.h"
@@ -19,3 +18,5 @@
 #include "i386.h"
 #include "pci.h"
 #include "clock.h"
+#include "lock.h"
+#include "deadlock.h"

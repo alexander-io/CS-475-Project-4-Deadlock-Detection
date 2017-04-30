@@ -75,8 +75,8 @@ void freeLinkedList(struct linkedlist* list) {
   }
 }
 
+// push
 void push(int pid, int isLock, struct linkedlist* list) {
-
   struct adjListNode* newNode = malloc(sizeof(struct adjListNode));
   newNode->id = pid;
   newNode->isLock = isLock;
@@ -84,6 +84,7 @@ void push(int pid, int isLock, struct linkedlist* list) {
   list->linkHead = newNode;
 }
 
+// contains
 int contains(struct adjListNode* searchNode, struct linkedlist* list) {
   struct adjListNode* currNode = list->linkHead;
   while(currNode != NULL) {
@@ -95,6 +96,7 @@ int contains(struct adjListNode* searchNode, struct linkedlist* list) {
   return 0;
 }
 
+// pull
 struct adjListNode* pull(struct adjListNode* searchNode, struct linkedlist* list) {
   struct adjListNode* currNode = list->linkHead;
   struct adjListNode* prevNode = NULL;
@@ -116,6 +118,7 @@ struct adjListNode* pull(struct adjListNode* searchNode, struct linkedlist* list
   return NULL;//the node was not found return false
 }
 
+// printList
 void printList(struct linkedlist* list){
   struct adjListNode* currNode = list->linkHead;
   if(currNode == NULL) {

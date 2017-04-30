@@ -324,7 +324,6 @@ void freeGlobals(){
   free(whiteList);
   free(greyList);
   free(blackList);
-
   freeAdjList(A);
   free(A);
 }
