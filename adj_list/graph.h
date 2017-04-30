@@ -22,6 +22,28 @@ struct linkedlist {
   struct adjListNode* linkHead;
 };
 
+// void freeNodeList() {
+//
+// }
+// void freeAdjList(struct AdjList* alist){
+//   struct
+// }
+
+void freeLinkedList(struct linkedlist* list) {
+  struct adjListNode* toFree = list->linkHead;
+  struct adjListNode* nextNode = toFree->nextNode;
+
+  if(nextNode == NULL) {
+    free(toFree);
+  }
+
+  while (nextNode != NULL) {
+    free(toFree);
+    toFree = nextNode;
+    nextNode = toFree->nextNode;
+  }
+}
+
 void push(int pid, int isLock, struct linkedlist* list) {
 
   struct adjListNode* newNode = malloc(sizeof(struct adjListNode));
