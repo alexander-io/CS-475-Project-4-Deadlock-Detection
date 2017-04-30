@@ -35,7 +35,7 @@ void push(int pid, int isLock, struct linkedlist* list) {
 
 void pull(int pid, int isLock, struct linkedlist* list) {
   struct adjListNode* currNode = list->linkHead;
-  struct adjListNode* prevNode;
+  struct adjListNode* prevNode = NULL;
 
   while(currNode != NULL) {
     //found the node we want to remove
@@ -56,10 +56,15 @@ void pull(int pid, int isLock, struct linkedlist* list) {
 
 void printList(struct linkedlist* list){
   struct adjListNode* currNode = list->linkHead;
+  if(currNode == NULL) {
+    printf("head null\n");
+    return;
+  }
   int currID;
   while(currNode != NULL) {
     currID = currNode->id;
-    printf("%d\n",currID);
+    printf("pl %d\n",currID);
+    currNode = currNode->nextNode;
   }
 }
 

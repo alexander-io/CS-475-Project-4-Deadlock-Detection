@@ -4,7 +4,7 @@
 #include "graph.h"
 
 struct AdjList *A;
-struct nodeList *whiteList, *greyList, *blackList; // helper list for deadlock detection
+struct linkedlist *whiteList, *greyList, *blackList; // helper list for deadlock detection
 
 int NLOCK = 10;
 int NPROC = 20;
@@ -142,8 +142,6 @@ void rag_print() {
 // detect deadlock in the graph
 void deadlock_detect(void) {
   struct nodeList *curr_list = A->head;
-  struct linkedlist* linkedlist = malloc(size(struct linkedlist))
-  // printList
 
   // // recursive_deadlock_detect(curr_list->headNode);
 
@@ -165,7 +163,9 @@ int recursive_deadlock_detect(struct adjListNode *head_node){
 
 // init adj list
 void initAdjList(){
-  whiteList = malloc(sizeof(struct nodeList));
+  whiteList = malloc(sizeof(struct linkedlist));
+  greyList = malloc(sizeof(struct linkedlist));
+  blackList = malloc(sizeof(struct linkedlist));
   A = malloc(sizeof(struct AdjList));
 }
 
