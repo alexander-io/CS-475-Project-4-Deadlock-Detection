@@ -84,3 +84,4 @@ void addNodeToList(struct nodeList *curr_node_list, int new_node_id, int isLock)
 void addNodeList(int head_node_id, int isLock);
 struct nodeList* getAdjList(struct adjListNode* nodeToFind);
 int recursive_deadlock_detect();
+void printNode(int pid, int isLock);

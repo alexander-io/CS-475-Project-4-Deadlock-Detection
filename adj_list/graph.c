@@ -151,13 +151,18 @@ void deadlock_detect(void) {
 
   //traverse the white list, for each node add it to the grey list
   struct adjListNode* currWhitelistNode = whiteList->linkHead;
+  printf("-----------------------------\n");
   while(currWhitelistNode != NULL) {
     curr_list = getAdjList(currWhitelistNode);
     struct adjListNode* currNode = curr_list->headNode;
 
     struct adjListNode* dfs = pull(currNode,whiteList);
     push(dfs->id, dfs->isLock,greyList);
-    recursive_deadlock_detect(dfs);
+
+    if(recursive_deadlock_detect(dfs)){
+      printf("\n");
+      return;
+    }
 
     currWhitelistNode = currWhitelistNode->nextNode;
   }
@@ -171,25 +176,25 @@ void deadlock_detect(void) {
 int recursive_deadlock_detect(struct adjListNode *dfsNode){
   struct nodeList* traversalNodeList = getAdjList(dfsNode);
   struct adjListNode* currNode = traversalNodeList->headNode->nextNode;
-  printf("start rec call\n");
   while(currNode != NULL){
-    printf("in while\n");
+    // printf("in while\n");
     if(contains(currNode,blackList)) {
-      printf("herererere\n");
-      continue;
+
     } else if(contains(currNode,greyList)) {
-      printf("wee ooo wee ooo cycle detected\n");
+      printf("DEADLOCK      ");
+      printNode(currNode->id, currNode->isLock);
       return 1;
     } else {
-      printf("stuck in white\n");
       struct adjListNode* tmpNode = pull(currNode,whiteList);
       push(tmpNode->id, tmpNode->isLock,greyList);
-      printf("before rec call\n");
-      recursive_deadlock_detect(currNode);
+
+      if(recursive_deadlock_detect(currNode)){
+        printNode(currNode->id, currNode->isLock);
+        return 1;
+      }
     }
     currNode = currNode->nextNode;
   }
-  printf("skipping\n");
   struct adjListNode* tmpNode = pull(dfsNode,greyList);
   push(tmpNode->id, tmpNode->isLock,blackList);
   return 0;
@@ -207,6 +212,14 @@ struct nodeList* getAdjList(struct adjListNode* nodeToFind) {
   }
   //did not find the node to find
   return NULL;
+}
+
+void printNode(int pid, int isLock) {
+  if(isLock) {
+    printf("lockid=%d ",pid);
+  } else {
+    printf("pid=%d ",pid);
+  }
 }
 
 // init adj list
@@ -309,7 +322,7 @@ int main(int argc, char** argv) {
   initAdjList();
 
   // read in file
-  FILE *file = fopen("./input2.txt","r");
+  FILE *file = fopen("./input4.txt","r");
   char line[21];
 
   int pid;
