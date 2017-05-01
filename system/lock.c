@@ -129,7 +129,7 @@ syscall	acquire(lid32 lockid)
 
 	// START
 	//lock the mutex!
-	mutex_lock(locktab[lockid]);
+	mutex_lock(locktab[lockid].lock);
 	// END
 
 	mask = disable();			//disable interrupts

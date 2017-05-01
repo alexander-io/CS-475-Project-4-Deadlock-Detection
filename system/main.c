@@ -7,8 +7,10 @@
 #define N 5	//number of philosophers and forks
 
 // locks must be declared and initialized here
-mutex_t locks[N]; // c initializes global scope array index values to 0, FALSE is an alias to 0
-mutex_t print_lock[1]; //
+// mutex_t locks[N]; // c initializes global scope array index values to 0, FALSE is an alias to 0
+lid32 locks[N];
+
+lid32 print_lock[1]; //
 /**
  * Delay for a random amount of time
  * @param alpha delay factor
@@ -42,6 +44,7 @@ void	think()
  */
 void	philosopher(uint32 phil_id)
 {
+
 	srand(phil_id); //seed
 	uint32 right = (phil_id+N-1)%N; // right fork
 	uint32 left = phil_id;	//  left fork
@@ -52,25 +55,25 @@ void	philosopher(uint32 phil_id)
 		r = rand()%10;
 		if (r<3){
 			// acquire the left fork
-			mutex_lock(&locks[left]);
+			acquire(&locks[left]);
 
 			// test the right lock, set it if its not acquired
 			if (!test_and_set(&locks[right])){
 
-				mutex_lock(&print_lock[0]);
+				acquire(&print_lock[0]);
 				printf("Philosopher %d eating : nom nom nom\n", phil_id);
-				mutex_unlock(&print_lock[0]);
+				release(&print_lock[0]);
 
 				eat();
 
-				mutex_unlock(&locks[right]);
+				release(&locks[right]);
 			}
-			mutex_unlock(&locks[left]);
+			release(&locks[left]);
 		} else {
 
-			mutex_lock(&print_lock[0]);
+			acquire(&print_lock[0]);
 			printf("Philosopher %d thinking : zzzzzZZZz\n", phil_id);
-			mutex_unlock(&print_lock[0]);
+			release(&print_lock[0]);
 
 			think();
 		} //think 70% of the time
@@ -79,6 +82,14 @@ void	philosopher(uint32 phil_id)
 
 int	main(uint32 argc, uint32 *argv)
 {
+	int i;
+	for(i=0;i<N;i++){
+		locks[i] = lock_create();
+
+	}
+	print_lock[0] = lock_create();
+
+
 	//do not change
 	ready(create((void*) philosopher, INITSTK, 15, "Ph1", 1, 0), FALSE);
 	ready(create((void*) philosopher, INITSTK, 15, "Ph2", 1, 1), FALSE);
