@@ -60,6 +60,7 @@ void	philosopher(uint32 phil_id)
 			// test the right lock, set it if its not acquired
 			if (!test_and_set(&locks[right])){
 
+
 				acquire(&print_lock[0]);
 				printf("Philosopher %d eating : nom nom nom\n", phil_id);
 				release(&print_lock[0]);

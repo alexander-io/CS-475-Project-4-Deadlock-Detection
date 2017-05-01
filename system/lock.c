@@ -38,9 +38,11 @@ local	lid32	newlock(void)
 	for(i=0;i<NLOCK;i++){
 
 		// find a lock that is free to use
-		if (locktab[i].lock == 0) {
+		if (locktab[i].state == LOCK_FREE) {
 			// set its state to used, and reset the mutex to FALSE
 			locktab[i].state = LOCK_USED;
+			mutex_unlock(locktab[i].lock);
+
 			// return its lockid
 			return i;
 		}
