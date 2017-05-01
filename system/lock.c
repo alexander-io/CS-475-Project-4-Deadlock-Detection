@@ -169,7 +169,8 @@ syscall	release(lid32 lockid)
 	//TODO - remove current process' ID from the lock's queue
 	remove(currpid, locktab[lockid].wait_queue);
 	// unlock the mutex
-	locktab[lockid].lock = FALSE;
+
+	locktab[lockid].lock = FALSE; // FIXME unlock mutex with mutex_unlock 
 
 	//TODO (RAG) - remove allocation edge from RAG
 	//TODO END
