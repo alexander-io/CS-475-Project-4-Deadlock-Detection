@@ -55,21 +55,31 @@ void	philosopher(uint32 phil_id)
 	{
 		// 70/30
 		r = rand()%10;
-		// if (r<3){
-		if (FALSE){
+		if (r<5){
+
+		// if (FALSE){
 			// acquire the left fork
+
+
 			acquire(print_lock);
-			printf("1\n");
+			printf("before pid: %d\n", phil_id);
 			release(print_lock);
 
 			acquire(locks[left]);
 
 			acquire(print_lock);
-			printf("2\n");
+			printf("mid pid: %d\n", phil_id);
 			release(print_lock);
+
+
+			// acquire(print_lock);
+			// // printf("2\n");
+			// release(print_lock);
 
 			// test the right lock, set it if its not acquired
 			if (!test_and_set(locks[right])){
+
+
 
 				acquire(print_lock);
 				printf("Philosopher %d eating : nom nom nom\n", phil_id);
@@ -93,6 +103,7 @@ void	philosopher(uint32 phil_id)
 
 int	main(uint32 argc, uint32 *argv)
 {
+	
 	int i;
 	for(i=0;i<N;i++){
 		locks[i] = lock_create();

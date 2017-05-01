@@ -119,14 +119,14 @@ syscall	acquire(lid32 lockid)
 		restore(mask);
 		return SYSERR;
 	}
-	kprintf("7\n");
+	// kprintf("7\n");
 	// START
 	// enqueue the current process ID on the lock's wait queue
 	enqueue(currpid,locktab[lockid].wait_queue, 69); // arbitrary priority value
 
 	//TODO (RAG) - add a request edge in the RAG
 	// END
-	kprintf("8%d\n", lockid);
+	// kprintf("8%d\n", lockid);
 	restore(mask);				//reenable interrupts
 
 	// START
@@ -134,7 +134,7 @@ syscall	acquire(lid32 lockid)
 	mutex_lock(&locktab[lockid].lock);
 	// locktab[lockid].lock = TRUE;
 	// END
-	kprintf("9\n");
+	// kprintf("9\n");
 
 	mask = disable();			//disable interrupts
 
@@ -166,11 +166,25 @@ syscall	release(lid32 lockid)
 		restore(mask);
 		return SYSERR;
 	}
-	kprintf("5\n");
+
+	
+	// kprintf("#");
 	// START
 	// remove current process' ID from the lock's queue
 	remove(currpid, locktab[lockid].wait_queue);
-	kprintf("4\n");
+	// kprintf("4\n");
+	// kprintf("@");
+	// TEST print
+	printqueue(locktab[lockid].wait_queue);
+
+	// if (currpid==2)
+	// {
+	// 	/* code */
+	// 	printf("$$$$$");
+	// 	printqueue(locktab[lockid].wait_queue);
+
+	// }
+
 	// unlock the mutex
 	mutex_unlock(&locktab[lockid].lock);
 

@@ -258,7 +258,7 @@ pid32	remove(pid32 pid, struct queue *q)
 	if (isempty(q)){
 		return EMPTY;	
 	}
-	// return SYSERR if pid is illegal
+	// return SYSERR if pid is illegal HACK FIXME
 	if(isbadpid(pid)){
 		return SYSERR;
 	}	
