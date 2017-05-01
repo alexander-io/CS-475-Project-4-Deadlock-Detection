@@ -41,7 +41,7 @@ local	lid32	newlock(void)
 		if (locktab[i].state == LOCK_FREE) {
 			// set its state to used, and reset the mutex to FALSE
 			locktab[i].state = LOCK_USED;
-			mutex_unlock(locktab[i].lock);
+			locktab[i].lock = FALSE;
 
 			// return its lockid
 			return i;
@@ -76,7 +76,7 @@ syscall	lock_delete(lid32 lockid)
 	// START
 	// reset lock's state to free and the mutex to FALSE
 	locktab[lockid].state = LOCK_FREE;
-	mutex_unlock(locktab[lockid].lock);
+	mutex_unlock(&locktab[lockid].lock);
 
 	// traverse the queue entries at index lockid in the lock-table
 	struct qentry *curr_entry = locktab[lockid].wait_queue->head;
@@ -119,20 +119,22 @@ syscall	acquire(lid32 lockid)
 		restore(mask);
 		return SYSERR;
 	}
-
+	kprintf("7\n");
 	// START
 	// enqueue the current process ID on the lock's wait queue
-	enqueue(currpid, locktab[lockid].wait_queue, 69); // arbitrary priority value
+	enqueue(currpid,locktab[lockid].wait_queue, 69); // arbitrary priority value
 
 	//TODO (RAG) - add a request edge in the RAG
 	// END
-
+	kprintf("8%d\n", lockid);
 	restore(mask);				//reenable interrupts
 
 	// START
 	//lock the mutex!
-	mutex_lock(locktab[lockid].lock);
+	mutex_lock(&locktab[lockid].lock);
+	// locktab[lockid].lock = TRUE;
 	// END
+	kprintf("9\n");
 
 	mask = disable();			//disable interrupts
 
@@ -164,12 +166,13 @@ syscall	release(lid32 lockid)
 		restore(mask);
 		return SYSERR;
 	}
-
+	kprintf("5\n");
 	// START
 	// remove current process' ID from the lock's queue
 	remove(currpid, locktab[lockid].wait_queue);
+	kprintf("4\n");
 	// unlock the mutex
-	mutex_lock(locktab[lockid].lock);
+	mutex_unlock(&locktab[lockid].lock);
 
 	//TODO (RAG) - remove allocation edge from RAG
 	// END
