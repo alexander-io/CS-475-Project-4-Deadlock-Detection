@@ -17,6 +17,12 @@ void	printqueue(struct queue *q)
 		kprintf("[]\n");
 		return;
 	}
+
+	if(isempty(q)) {
+		kprintf("[-]\n");
+		return;
+	}
+
 	struct qentry *toPrint = q->head;
 
 	kprintf("[(pid=p%d,%d)",toPrint->process_id, toPrint->key);
@@ -89,6 +95,10 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 		return SYSERR;
 	}
 
+	kprintf("enque pid:%d\n", pid);
+	kprintf("key:%d\n",key);
+	kprintf("size: %d\n", q->size);
+	// printqueue(q);
     // allocate space on heap for a new QEntry
 	struct qentry *new_qentry = malloc(sizeof(struct qentry));
     // initialize the new QEntry
@@ -103,12 +113,12 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 	else{
 		// compare keys
 		struct qentry *toCompare = q->head;
-
+		// kprintf("before while");
 		// loop through the entries in the queue, compare the keys
 		while(toCompare!=NULL){
 			// if we've found a key with a higher priority, let's insert it
 			if (toCompare->key < key) {
-
+				kprintf("found key with higher pr");
 				// we've found that they key needs to be inserted...
 				// check if toCompare is head
 				if (toCompare == q->head){
@@ -117,26 +127,33 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 					q->head->prev = new_qentry;
 					q->head = new_qentry; 
 				} else {
+					kprintf("else");
 					// insert new_qentry into body
 					new_qentry->next = toCompare;
 					new_qentry->prev = toCompare->prev;
 					toCompare->prev->next = new_qentry;
 					toCompare->prev = new_qentry;
 				}
+				// kprintf("before break\n");
 				break;
 			}
 			// if we're at the last entry
 			if (toCompare == q-> tail && key <= q->tail->key) {
+				kprintf("last");
 				// new_qentry becomes new tail
 				new_qentry->prev = q->tail;
 				q->tail->next = new_qentry;
 				q->tail = new_qentry;
 				toCompare = toCompare->next;
+				break;
+				// kprintf("if tocompare q\n");
 			} 
 			toCompare = toCompare->next;
 		}
 	}
 	q->size++;
+	kprintf("enq size:%d" ,q->size);
+	printqueue(q);
 	return pid;
 }
 
@@ -254,35 +271,47 @@ pid32	getlast(struct queue *q)
  */
 pid32	remove(pid32 pid, struct queue *q)
 {
+	kprintf("in remove\n");
 	//return EMPTY if queue is empty
 	if (isempty(q)){
+		kprintf("--------------------\n");
 		return EMPTY;	
 	}
 	// return SYSERR if pid is illegal HACK FIXME
 	if(isbadpid(pid)){
+		kprintf("++++++++++++++\n");
+
 		return SYSERR;
 	}	
-	
+	kprintf("the pid: %d", pid);
+	printqueue(q);
 	//remove process identified by pid parameter from the queue and return its pid
 	if(q->head->process_id == pid){
+		kprintf("d size sucks:%d",q->size);
+
 		return dequeue(q);
 	}
 	if(q->tail->process_id == pid){
+		kprintf("d size sucks:%d",q->size);
+
 		return getlast(q);
 	}
 	if(q->size > 2){
+		kprintf("this sucks");
 		struct qentry *checking = q->head->next;
 		while(checking != NULL){
 			if(checking->process_id == pid){
 				checking->prev->next = checking->next;
 				checking->next->prev = checking->prev;
 				free(checking, sizeof(checking));
+				q->size--;
+				kprintf("d size sucks:%d" ,q->size);
 				return pid;
 			}
 			checking = checking->next;	
 		}
 	}
-
+	kprintf("???????????\n");
 	//if pid does not exist in the queue, return SYSERR
 	return SYSERR;
 }

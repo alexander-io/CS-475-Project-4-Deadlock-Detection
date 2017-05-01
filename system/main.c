@@ -55,9 +55,9 @@ void	philosopher(uint32 phil_id)
 	{
 		// 70/30
 		r = rand()%10;
-		if (r<5){
+		// if (r<5){
 
-		// if (FALSE){
+		if (FALSE){
 			// acquire the left fork
 
 
@@ -92,9 +92,9 @@ void	philosopher(uint32 phil_id)
 			release(locks[left]);
 		} else {
 
-			acquire(print_lock);
+			// acquire(print_lock);
 			kprintf("Philosopher %d thinking : zzzzzZZZz\n", phil_id);
-			release(print_lock);
+			// release(print_lock);
 
 			think();
 		} //think 70% of the time
@@ -103,7 +103,7 @@ void	philosopher(uint32 phil_id)
 
 int	main(uint32 argc, uint32 *argv)
 {
-	
+
 	int i;
 	for(i=0;i<N;i++){
 		locks[i] = lock_create();
