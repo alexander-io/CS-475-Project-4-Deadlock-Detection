@@ -36,8 +36,6 @@ local	lid32	newlock(void)
 	// START
 	// loop through each element in the lock table.
 	for(i=0;i<NLOCK;i++){
-		// 0=false=free
-		// 1=true=taken
 
 		// find a lock that is free to use
 		if (locktab[i].lock == 0) {
@@ -76,7 +74,7 @@ syscall	lock_delete(lid32 lockid)
 	// START
 	// reset lock's state to free and the mutex to FALSE
 	locktab[lockid].state = LOCK_FREE;
-	locktab[lockid].lock = FALSE;
+	mutex_unlock(locktab[lockid].lock);
 
 	// traverse the queue entries at index lockid in the lock-table
 	struct qentry *curr_entry = locktab[lockid].wait_queue->head;
@@ -120,25 +118,25 @@ syscall	acquire(lid32 lockid)
 		return SYSERR;
 	}
 
-	//TODO START
-	//TODO - enqueue the current process ID on the lock's wait queue
+	// START
+	// enqueue the current process ID on the lock's wait queue
+	enqueue(currpid, locktab[lockid].wait_queue, 69); // arbitrary priority value
 
-	enqueue(currpid, locktab[lockid].wait_queue, 5); // HACK HACK CHOP CHOP
 	//TODO (RAG) - add a request edge in the RAG
-	//TODO END
+	// END
 
 	restore(mask);				//reenable interrupts
 
-	//TODO START
-	//TODO - lock the mutex!
-	locktab[lockid].lock = TRUE;
-	//TODO END
+	// START
+	//lock the mutex!
+	mutex_lock(locktab[lockid]);
+	// END
 
 	mask = disable();			//disable interrupts
 
-	//TODO START
+	// START
 	//TODO (RAG) - we reache this point. Must've gotten the lock! Transform request edge to allocation edge
-	//TODO END
+	// END
 
 	restore(mask);				//reenable interrupts
 	return OK;
@@ -165,15 +163,14 @@ syscall	release(lid32 lockid)
 		return SYSERR;
 	}
 
-	//TODO START
-	//TODO - remove current process' ID from the lock's queue
+	// START
+	// remove current process' ID from the lock's queue
 	remove(currpid, locktab[lockid].wait_queue);
 	// unlock the mutex
-
-	locktab[lockid].lock = FALSE; // FIXME unlock mutex with mutex_unlock 
+	mutex_lock(locktab[lockid].lock);
 
 	//TODO (RAG) - remove allocation edge from RAG
-	//TODO END
+	// END
 
 	restore(mask);
 	return OK;
