@@ -75,7 +75,7 @@ typedef uint32 mutex_t;
 #define AGING TRUE
 
 // for the timer. we use little endian
-#define QUANTUM 10 // msecs
+#define QUANTUM 1 // msecs
 
 /* Prototypes of I/O functions used throughout the kernel */
 
