@@ -12,7 +12,7 @@ struct queue *readyqueue;	/** ready queue */
  */
 status	ready(pid32 pid, bool8 resch)
 {
-	kprintf("READY CALL\n");
+	// kprintf("READY CALL\n");
 	register struct procent *prptr;
 
 	if (isbadpid(pid))
