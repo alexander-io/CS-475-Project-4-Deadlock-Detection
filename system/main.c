@@ -56,9 +56,9 @@ void	philosopher(uint32 phil_id)
 		// 70/30
 		r = rand()%10;
 		if (r<3){
-			acquire(print_lock);
-			printf("Philosopher %d decided to eat\n", phil_id);
-			release(print_lock);
+			// acquire(print_lock);
+			// printf("Philosopher %d decided to eat\n", phil_id);
+			// release(print_lock);
 
 			// if (FALSE){
 			// acquire the left fork
@@ -67,17 +67,14 @@ void	philosopher(uint32 phil_id)
 			acquire(locks[left]);
 
 
+			
 			// acquire(print_lock);
-			// // printf("2\n");
+			// kprintf("philosopher %d acquired their left fork\n", phil_id);
 			// release(print_lock);
-			acquire(print_lock);
-
-			kprintf("philosopher %d acquired their left fork\n", phil_id);
-			release(print_lock);
 
 
 			// test the right lock, set it if its not acquired
-			if (!test_and_set(locks[right])){ // FIXME ? 
+			if (!test_and_set(&locktab[locks[right]].lock)){ // FIXME ?
 
 				// kprintf("philosopher %d acquired their", phil_id);
 
@@ -90,28 +87,28 @@ void	philosopher(uint32 phil_id)
 
 				eat();
 
-				acquire(print_lock);
-				kprintf("phil %d about to release RIGHT fork\n", phil_id);
-				release(print_lock);
+				// acquire(print_lock);
+				// kprintf("phil %d about to release RIGHT fork\n", phil_id);
+				// release(print_lock);
 				
 
 				release(locks[right]);
 
-				acquire(print_lock);
-				kprintf("phil %d has released RIGHT fork\n", phil_id);
-				release(print_lock);
+				// acquire(print_lock);
+				// kprintf("phil %d has released RIGHT fork\n", phil_id);
+				// release(print_lock);
 
 			}
-			acquire(print_lock);
-			kprintf("phil %d about to release LEFT fork\n", phil_id);
-			release(print_lock);
+			// acquire(print_lock);
+			// kprintf("phil %d about to release LEFT fork\n", phil_id);
+			// release(print_lock);
 			
 
 			release(locks[left]);
 
-			acquire(print_lock);
-			kprintf("phil %d has released LEFT fork\n", phil_id);
-			release(print_lock);
+			// acquire(print_lock);
+			// kprintf("phil %d has released LEFT fork\n", phil_id);
+			// release(print_lock);
 
 		} else {
 
@@ -136,8 +133,8 @@ int	main(uint32 argc, uint32 *argv)
 	//do not change
 	ready(create((void*) philosopher, INITSTK, 15, "Ph1", 1, 0), FALSE);
 	ready(create((void*) philosopher, INITSTK, 15, "Ph2", 1, 1), FALSE);
-	// ready(create((void*) philosopher, INITSTK, 15, "Ph3", 1, 2), FALSE);
-	// ready(create((void*) philosopher, INITSTK, 15, "Ph4", 1, 3), FALSE);
-	// ready(create((void*) philosopher, INITSTK, 15, "Ph5", 1, 4), FALSE);
+	ready(create((void*) philosopher, INITSTK, 15, "Ph3", 1, 2), FALSE);
+	ready(create((void*) philosopher, INITSTK, 15, "Ph4", 1, 3), FALSE);
+	ready(create((void*) philosopher, INITSTK, 15, "Ph5", 1, 4), FALSE);
 	return 0;
 }
