@@ -20,4 +20,3 @@
 #include "clock.h"
 #include "lock.h"
 #include "deadlock.h"
-#include "adjlist.h"
