@@ -25,7 +25,7 @@ void	printqueue(struct queue *q)
 
 	struct qentry *toPrint = q->head;
 
-	// kprintf("[(pid=p%d,%d)",toPrint->process_id, toPrint->key);
+	kprintf("[(pid=p%d,%d)",toPrint->process_id, toPrint->key);
 
 	toPrint = toPrint->next;
 	while(toPrint != NULL){
@@ -96,11 +96,6 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 		return SYSERR;
 	}
 
-	// kprintf("curr pid : %d", currpid);
-	// kprintf("enque pid:%d\n", pid);
-	// kprintf("key:%d\n",key);
-	// kprintf("size: %d\n", q->size);
-	// printqueue(q);
     // allocate space on heap for a new QEntry
 	struct qentry *new_qentry = malloc(sizeof(struct qentry));
     // initialize the new QEntry
@@ -115,12 +110,10 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 	else{
 		// compare keys
 		struct qentry *toCompare = q->head;
-		// kprintf("before while");
 		// loop through the entries in the queue, compare the keys
 		while(toCompare!=NULL){
 			// if we've found a key with a higher priority, let's insert it
 			if (toCompare->key < key) {
-				// kprintf("found key with higher pr");
 				// we've found that they key needs to be inserted...
 				// check if toCompare is head
 				if (toCompare == q->head){
@@ -129,33 +122,27 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 					q->head->prev = new_qentry;
 					q->head = new_qentry;
 				} else {
-					// kprintf("else");
 					// insert new_qentry into body
 					new_qentry->next = toCompare;
 					new_qentry->prev = toCompare->prev;
 					toCompare->prev->next = new_qentry;
 					toCompare->prev = new_qentry;
 				}
-				// kprintf("before break\n");
 				break;
 			}
 			// if we're at the last entry
 			if (toCompare == q-> tail && key <= q->tail->key) {
-				// kprintf("last");
 				// new_qentry becomes new tail
 				new_qentry->prev = q->tail;
 				q->tail->next = new_qentry;
 				q->tail = new_qentry;
 				toCompare = toCompare->next;
 				break;
-				// kprintf("if tocompare q\n");
 			}
 			toCompare = toCompare->next;
 		}
 	}
 	q->size++;
-	// kprintf("enq size:%d" ,q->size);
-	// printqueue(q);
 	return pid;
 }
 
@@ -167,7 +154,6 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
  */
 pid32 dequeue(struct queue *q)
 {
-	// kprintf("dequque called\n");
     // return EMPTY if queue is empty
 	if (isempty(q)){
 		kprintf("queue is empty, return -1\n");
@@ -178,11 +164,8 @@ pid32 dequeue(struct queue *q)
 	struct qentry *old_head = q->head;
 	pid32 return_pid = old_head->process_id;
 
-	// kprintf("dequeue process id : %d\n", return_pid);
-
     // unlink the head entry from the rest
 	if (q->size == 1){
-		// kprintf("dequeue & queue is size 1, so set tail/head -> null\n");
 		q->tail = NULL;
 		q->head = NULL;
 	}
@@ -312,83 +295,3 @@ pid32	remove(pid32 pid, struct queue *q)
 	//if pid does not exist in the queue, return SYSERR
 	return SYSERR;
 }
-
-/*
-int main(){
-	struct queue my_queue = {NULL, NULL, 0};
-
-	//enqueue(pid32 pid, struct queue *q)
-
-	printqueue(&my_queue);
-	enqueue(1, &my_queue, 1);
-	printqueue(&my_queue);
-	enqueue(3, &my_queue, 2);
-	printqueue(&my_queue);
-	// dequeue(&my_queue);
-	// printqueue(&my_queue);
-	// dequeue(&my_queue);
-	// dequeue(&my_queue);
-	// dequeue(&my_queue);
-	// printqueue(&my_queue);
-
-
-
-
-	enqueue(1, &my_queue, 3);
-	printqueue(&my_queue);
-	// remove(1,&my_queue);
-	// printqueue(&my_queue);
-
-	// enqueue(1, &my_queue);
-	// enqueue(2, &my_queue);
-	// printqueue(&my_queue);
-
-	// remove(1,&my_queue);
-	// printqueue(&my_queue);
-
-	// enqueue(1, &my_queue);
-	// enqueue(3, &my_queue);
-	// printqueue(&my_queue);
-
-	// remove(2,&my_queue);
-	// printqueue(&my_queue);
-
-	//struct qentry *returned_qentry = getbypid(4, &my_queue);
-	//printf("\nreturned qentry pid : %p\n", returned_qentry);
-
-
-
-	// dequeue(&my_queue);
-
-	// enqueue(2, &my_queue);
-	// //enqueue(3, &my_queue);
-	// printqueue(&my_queue);
-	// dequeue(&my_queue);
-	// dequeue(&my_queue);
-	// dequeue(&my_queue);
-
-
-	// //printqueue(&my_queue);
-
-	// //printf("\nhead : %d\n", my_queue.head->process_id);
-	// // call printqueue()
-	// //printqueue(&my_queue);
-
-	// dequeue(&my_queue);
-	// printqueue(&my_queue);
-	// dequeue(&my_queue);
-	// printqueue(&my_queue);
-	// dequeue(&my_queue);
-	// printqueue(&my_queue);
-	//dequeue(&my_queue);
-	//dequeue(&my_queue);
-	//printf("\nhead : %d\n", my_queue.head->process_id);
-
-
-	//qentry.process_id = 1;
-
-	//struct queue = {.};
-
-	return 0;
-}
-*/

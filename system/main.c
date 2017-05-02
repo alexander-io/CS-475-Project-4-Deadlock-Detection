@@ -43,77 +43,37 @@ void	think()
  */
 void	philosopher(uint32 phil_id)
 {
-
 	srand(phil_id); //seed
 	uint32 right = (phil_id+N-1)%N; // right fork
 	uint32 left = phil_id;	//  left fork
 	int r; // declare random integer variable used for 30/70% comparison
-
-
 
 	while (TRUE)
 	{
 		// 70/30
 		r = rand()%10;
 		if (r<3){
-			// acquire(print_lock);
-			// printf("Philosopher %d decided to eat\n", phil_id);
-			// release(print_lock);
-
-			// if (FALSE){
 			// acquire the left fork
-
-
 			acquire(locks[left]);
 
-
-			
-			// acquire(print_lock);
-			// kprintf("philosopher %d acquired their left fork\n", phil_id);
-			// release(print_lock);
-
-
 			// test the right lock, set it if its not acquired
-			if (!test_and_set(&locktab[locks[right]].lock)){ // FIXME ?
-
-				// kprintf("philosopher %d acquired their", phil_id);
+			if (!test_and_set(&locktab[locks[right]].lock)){
 
 				acquire(print_lock);
 				printf("Philosopher %d eating : nom nom nom\n", phil_id);
 				release(print_lock);
 
-				
-
-
 				eat();
 
-				// acquire(print_lock);
-				// kprintf("phil %d about to release RIGHT fork\n", phil_id);
-				// release(print_lock);
-				
-
 				release(locks[right]);
-
-				// acquire(print_lock);
-				// kprintf("phil %d has released RIGHT fork\n", phil_id);
-				// release(print_lock);
-
 			}
-			// acquire(print_lock);
-			// kprintf("phil %d about to release LEFT fork\n", phil_id);
-			// release(print_lock);
-			
-
 			release(locks[left]);
-
-			// acquire(print_lock);
-			// kprintf("phil %d has released LEFT fork\n", phil_id);
-			// release(print_lock);
 
 		} else {
 
 			acquire(print_lock);
 			kprintf("Philosopher %d thinking : zzzzzZZZz\n", phil_id);
+			printqueue(readyqueue);
 			release(print_lock);
 
 			think();

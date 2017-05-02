@@ -36,19 +36,17 @@ local	lid32	newlock(void)
 	// START
 	// loop through each element in the lock table.
 	for(i=0;i<NLOCK;i++){
-
 		// find a lock that is free to use
 		if (locktab[i].state == LOCK_FREE) {
 			// set its state to used, and reset the mutex to FALSE
 			locktab[i].state = LOCK_USED;
 			locktab[i].lock = FALSE;
-
 			// return its lockid
 			return i;
 		}
 	}
 	// if there is no such lock, return SYSERR
-	return SYSERR; // END
+	return SYSERR;
 }
 
 
@@ -82,11 +80,7 @@ syscall	lock_delete(lid32 lockid)
 	struct qentry *curr_entry = locktab[lockid].wait_queue->head;
 	while (curr_entry!=NULL){
 		// remove all processes waiting on its queue, and send them to the ready queue
-		// kprintf(">>%d",currpid);
-		// printqueue(locktab[lockid].wait_queue);
 		enqueue(remove(curr_entry->process_id, locktab[lockid].wait_queue), readyqueue, curr_entry->key);
-		// printqueue(locktab[lockid].wait_queue);
-
 		// move to the next entry
 		curr_entry = curr_entry->next;
 	}
@@ -110,7 +104,7 @@ syscall	acquire(lid32 lockid)
 {
 	intmask mask;			// saved interrupt mask
 	struct	lockentry *lptr;	// ptr to sempahore table entry
-	// kprintf("start acquire\n");
+
 	mask = disable();
 	if (isbadlock(lockid)) {
 		restore(mask);
@@ -122,28 +116,20 @@ syscall	acquire(lid32 lockid)
 		restore(mask);
 		return SYSERR;
 	}
-	// kprintf("7\n");
+
 	// START
 	// enqueue the current process ID on the lock's wait queue
-	// kprintf("start enque acquire\n");
-
 	enqueue(currpid,locktab[lockid].wait_queue, 69); // arbitrary priority value
-	// kprintf("start lock acquiresad\n");
 
 	//TODO (RAG) - add a request edge in the RAG
 	// END
-	// kprintf("8%d\n", lockid);
-	restore(mask);				//reenable interrupts
 
-	// kprintf("start lock acquire\n");
+	restore(mask);				//reenable interrupts
 
 	// START
 	//lock the mutex!
 	mutex_lock(&locktab[lockid].lock);
-	// locktab[lockid].lock = TRUE;
 	// END
-	// kprintf("9\n");
-	// kprintf("done acquire\n");
 
 	mask = disable();			//disable interrupts
 
@@ -162,7 +148,6 @@ syscall	acquire(lid32 lockid)
  */
 syscall	release(lid32 lockid)
 {
-	// printf("at release\n");
 	intmask mask;			/* saved interrupt mask		*/
 	struct	lockentry *lptr;	/* ptr to lock table entry	*/
 
@@ -181,24 +166,10 @@ syscall	release(lid32 lockid)
 	// START
 	// remove current process' ID from the lock's queue
 	remove(currpid, locktab[lockid].wait_queue);
-	// kprintf("4\n");
-	// kprintf("@");
-
-	// TEST print
-	// printqueue(locktab[lockid].wait_queue);
-	// printf("after print q\n");
-
-	// if (currpid==2)
-	// {
-	// 	/* code */
-	// 	printf("$$$$$");
-	// 	printqueue(locktab[lockid].wait_queue);
-
-	// }
 
 	// unlock the mutex
 	mutex_unlock(&locktab[lockid].lock);
-	// printf("after unlock\n");
+	
 	//TODO (RAG) - remove allocation edge from RAG
 	// END
 
