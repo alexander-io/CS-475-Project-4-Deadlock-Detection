@@ -83,9 +83,9 @@ syscall	lock_delete(lid32 lockid)
 	while (curr_entry!=NULL){
 		// remove all processes waiting on its queue, and send them to the ready queue
 		// kprintf(">>%d",currpid);
-		printqueue(locktab[lockid].wait_queue);
+		// printqueue(locktab[lockid].wait_queue);
 		enqueue(remove(curr_entry->process_id, locktab[lockid].wait_queue), readyqueue, curr_entry->key);
-		printqueue(locktab[lockid].wait_queue);
+		// printqueue(locktab[lockid].wait_queue);
 
 		// move to the next entry
 		curr_entry = curr_entry->next;
@@ -185,7 +185,7 @@ syscall	release(lid32 lockid)
 	// kprintf("@");
 
 	// TEST print
-	printqueue(locktab[lockid].wait_queue);
+	// printqueue(locktab[lockid].wait_queue);
 	// printf("after print q\n");
 
 	// if (currpid==2)

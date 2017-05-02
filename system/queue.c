@@ -155,7 +155,7 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 	}
 	q->size++;
 	// kprintf("enq size:%d" ,q->size);
-	printqueue(q);
+	// printqueue(q);
 	return pid;
 }
 
@@ -278,33 +278,25 @@ pid32	getlast(struct queue *q)
  */
 pid32	remove(pid32 pid, struct queue *q)
 {
-	// kprintf("in remove\n");
 	//return EMPTY if queue is empty
 	if (isempty(q)){
-		kprintf("--------------------\n");
 		return EMPTY;
 	}
 	// return SYSERR if pid is illegal HACK FIXME
 	if(isbadpid(pid)){
-		kprintf("++++++++++++++\n");
 
 		return SYSERR;
 	}
-	kprintf("the pid: %d", pid);
-	printqueue(q);
 	//remove process identified by pid parameter from the queue and return its pid
 	if(q->head->process_id == pid){
-		// kprintf("d size sucks:%d",q->size);
 
 		return dequeue(q);
 	}
 	if(q->tail->process_id == pid){
-		// kprintf("d size sucks:%d",q->size);
 
 		return getlast(q);
 	}
 	if(q->size > 2){
-		// kprintf("this sucks");
 		struct qentry *checking = q->head->next;
 		while(checking != NULL){
 			if(checking->process_id == pid){
@@ -312,13 +304,11 @@ pid32	remove(pid32 pid, struct queue *q)
 				checking->next->prev = checking->prev;
 				free(checking, sizeof(checking));
 				q->size--;
-				// kprintf("d size sucks:%d" ,q->size);
 				return pid;
 			}
 			checking = checking->next;
 		}
 	}
-	kprintf("???????????\n");
 	//if pid does not exist in the queue, return SYSERR
 	return SYSERR;
 }
