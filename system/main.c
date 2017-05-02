@@ -103,7 +103,7 @@ void	philosopher(uint32 phil_id)
 
 int	main(uint32 argc, uint32 *argv)
 {
-	kprintf("hello world\n");
+	// kprintf("hello world\n");
 	// int i;
 	// for(i=0;i<N;i++){
 	// 	locks[i] = lock_create();

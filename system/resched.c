@@ -8,6 +8,7 @@
  */
 void	resched(void)		// assumes interrupts are disabled
 {
+	kprintf("RESCHED CALL id : %d\n", currpid);
 	struct procent *ptold;	// ptr to table entry for old process
 	struct procent *ptnew;	// ptr to table entry for new process
 

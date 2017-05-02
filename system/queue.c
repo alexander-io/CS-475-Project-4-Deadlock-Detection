@@ -92,9 +92,11 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 {	
     // check if queue is full and if pid is illegal, and return SYSERR if either is true
 	if (isfull(q) || isbadpid(pid)){
+		kprintf("in enqueue, queue is full or is badpid\n");
 		return SYSERR;
 	}
 
+	kprintf("curr pid : %d", currpid);
 	kprintf("enque pid:%d\n", pid);
 	kprintf("key:%d\n",key);
 	kprintf("size: %d\n", q->size);
@@ -164,18 +166,23 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
  * @return pid of the process removed, or EMPTY if queue is empty
  */
 pid32 dequeue(struct queue *q)
-{
+{	
+	// kprintf("dequque called\n");
     // return EMPTY if queue is empty
 	if (isempty(q)){
+		kprintf("queue is empty, return -1\n");
 		return EMPTY;	
 	}
 
         // get the head entry of the queue
 	struct qentry *old_head = q->head;
 	pid32 return_pid = old_head->process_id;
+
+	kprintf("dequeue process id : %d\n", return_pid);
 			
     // unlink the head entry from the rest
 	if (q->size == 1){
+		kprintf("dequeue & queue is size 1, so set tail/head -> null\n");
 		q->tail = NULL;
 		q->head = NULL;
 	}

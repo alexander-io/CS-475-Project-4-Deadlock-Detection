@@ -80,8 +80,13 @@ void	nulluser(void)
 	// Enable interrupts
 	enable();
 
+	printqueue(readyqueue);
+	kprintf("before ready call ^\n");
 	//spawn a process running main() from main.c
 	ready(create((void*) main, INITSTK, INITPRIO, "MAIN1", 2, 0, NULL), FALSE);
+	printqueue(readyqueue);
+	kprintf("after ready call ^");
+
 
 	//schedule the above processes
 	while (TRUE)
