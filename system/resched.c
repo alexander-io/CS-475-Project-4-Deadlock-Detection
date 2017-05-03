@@ -19,21 +19,23 @@ void	resched(void)		// assumes interrupts are disabled
 	}
 	// kprintf("res fun dead: %d\n", deadlock);
 	// kprintf("before condition %d\n", deadlock);
+	// printqueue(readyqueue);
 	if(deadlock >= 50){
 		deadlock = 0;
-		kprintf("deadlock: %d\n", deadlock);
+		// kprintf("deadlock: %d\n", deadlock);
 		// kprintf("xinusucks\n");
 		intmask mask = disable();   //disable interrupts
-		kprintf("before detect\n");
+		// kprintf("before detect\n");
 		if(deadlock_detect()) {
-			kprintf("stop\n");
+			// kprintf("stop\n");
 			restartLinkedList(whiteList);
 			restartLinkedList(blackList);
 			restartLinkedList(greyList);
 			kill(deadlock_recover());
 		}
 		lockedLock = NULL;
-		kprintf("fter detect\n");
+		// kprintf("fter detect\n");
+		// printqueue(readyqueue);
 
 		//other code with interrupt disabled
 		restore(mask);          //reenable interrupts
@@ -45,6 +47,7 @@ void	resched(void)		// assumes interrupts are disabled
 	// kprintf("currpid: %d\n",currpid);
 	//  check ptold's state. If it's running, put it on the ready queue and change state to ready
 	if (ptold->prstate == PR_CURR){
+		// kprintf("enqueue\n");
 		ptold->prstate = PR_READY;
 		enqueue(currpid, readyqueue, ptold->iniprprio);
 	}

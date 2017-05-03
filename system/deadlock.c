@@ -314,21 +314,22 @@ pid32 deadlock_recover() {
 
   int flag = 0;
   while(traversalNodeList != NULL){
-    if(!traversalNodeList->headNode->isLock ) {
-      currNode = traversalNodeList->headNode->nextNode;
-
-      while(currNode != NULL) {
-
-        if(currNode->id == lockedLock->id && currNode->isLock) {
-          victim = traversalNodeList->headNode->id;
-          // kprintf("victim id:%d\n", victim);
-          // kprintf("staph");
-          flag = 1;
-          break;
-        }
-        currNode = currNode->nextNode;
-      }
-      if(flag) {break;}
+    if(traversalNodeList->headNode->isLock && traversalNodeList->headNode->id == lockedLock->id) {
+      victim = traversalNodeList->headNode->nextNode->id;
+      // rag_print();
+      // kprintf("victim id:%d\n", victim);
+      break;
+      // while(currNode != NULL) {
+      //
+      //   if(currNode->id == lockedLock->id && currNode->isLock) {
+      //     victim = traversalNodeList->headNode->nextNode->id;
+      //     // kprintf("staph");
+      //     flag = 1;
+      //     break;
+      //   }
+      //   currNode = currNode->nextNode;
+      // }
+      // if(flag) {break;}
     }
 
     // kprintf("before flag\n");
@@ -337,21 +338,27 @@ pid32 deadlock_recover() {
 
 
   // kprintf("prints are the best\n");
-
   int i;
   for (i = 0; i < NLOCK; i++) {
+    // printqueue(locktab[i].wait_queue);
     remove(victim, locktab[i].wait_queue);
+    // printqueue(locktab[i].wait_queue);
   }
 
-  mutex_unlock(&deadLock.lock);
+
+  // kprintf("lock: %d\n",deadLock.lock);
+  mutex_unlock(&locktab[lockedLock->id].lock);
+  // kprintf("2lock: %d\n",deadLock.lock);
+
 
   for (i = 0; i < 2; i++) {
     // kprintf("before lockedid %d\n", lockedLock->id);
-    // removeReqEdge(victim, i); //TODO
+    removeReqEdge(victim, i);
     rag_dealloc(victim, i);
     // kprintf("lockedid %d\n", lockedLock->id);
   }
   kprintf("DEADLOCK RECOVER\tkilling pid=%d to release lockid=%d\n", victim, lockedLock->id);
+  // rag_print();
   return victim;
 }
 
@@ -365,7 +372,7 @@ int recursive_deadlock_detect(struct adjListNode *dfsNode){
   struct nodeList* traversalNodeList = getAdjList(dfsNode);
   // kprintf("mid of rdld\n");
   if(traversalNodeList == NULL) {
-    kprintf("if trav nodelist %d");
+    // kprintf("if trav nodelist %d");
     return 0;
   }
   // kprintf("traversalNodeList id: %d\n ",traversalNodeList->headNode->id);
@@ -382,7 +389,7 @@ int recursive_deadlock_detect(struct adjListNode *dfsNode){
     if(contains(currNode,blackList)) {
       // kprintf("in blackList");
     } else if(contains(currNode,greyList)) {
-      kprintf("DEADLOCK      ");
+      kprintf("DEADLOCK\t\t");
       if(currNode->isLock == 1) {
         lockedLock = currNode;
       }
