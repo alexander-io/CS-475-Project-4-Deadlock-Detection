@@ -9,8 +9,7 @@
  * Prints out contents of a queue
  * @param q	pointer to a queue
  */
-void	printqueue(struct queue *q)
-{
+void	printqueue(struct queue *q) {
 	// print all contents from head to tail
 	// format should be [(pid=p1), (pid=p2), ...
 	if(q->head == NULL){

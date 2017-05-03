@@ -136,7 +136,7 @@ syscall	acquire(lid32 lockid)
 	enqueue(currpid,locktab[lockid].wait_queue, 69); // arbitrary priority value
 
 	//(RAG) - add a request edge in the RAG
-	kprintf("before rag req");
+	kprintf("before rag req\n");
 	rag_request(currpid, lockid);
 	// END
 
@@ -151,7 +151,7 @@ syscall	acquire(lid32 lockid)
 
 	// START
 	//(RAG) - we reache this point. Must've gotten the lock! Transform request edge to allocation edge
-	kprintf("before rag all");
+	kprintf("before rag all\n");
 	rag_alloc(currpid, lockid);
 	// END
 
@@ -189,7 +189,7 @@ syscall	release(lid32 lockid)
 	mutex_unlock(&locktab[lockid].lock);
 
 	//(RAG) - remove allocation edge from RAG
-	kprintf("before rag dealloc");
+	kprintf("before rag dealloc\n");
 	rag_dealloc(currpid, lockid);
 	// END
 

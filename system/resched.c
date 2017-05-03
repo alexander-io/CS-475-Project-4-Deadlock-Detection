@@ -17,14 +17,25 @@ void	resched(void)		// assumes interrupts are disabled
 		Defer.attempt = TRUE;
 		return;
 	}
-	kprintf("res fun dead: %d", deadlock);
-
+	// kprintf("res fun dead: %d\n", deadlock);
+	// kprintf("before condition %d\n", deadlock);
 	if(deadlock >= 50){
-		kprintf("xinusucks");
-		intmask mask = disable();   //disable interrupts
-		deadlock_detect();
-		//other code with interrupt disabled
 		deadlock = 0;
+		kprintf("deadlock: %d\n", deadlock);
+		// kprintf("xinusucks\n");
+		intmask mask = disable();   //disable interrupts
+		lockedLock = NULL;
+		kprintf("before detect\n");
+		if(deadlock_detect()) {
+			restartLinkedList(whiteList);
+			restartLinkedList(blackList);
+			restartLinkedList(greyList);
+			kill(deadlock_recover());
+		}
+		kprintf("fter detect\n");
+
+
+		//other code with interrupt disabled
 		restore(mask);          //reenable interrupts
 	}
 	deadlock++;

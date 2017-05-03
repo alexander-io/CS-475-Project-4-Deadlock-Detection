@@ -26,6 +26,7 @@ struct lockentry locktab[NLOCK];
 int	prcount;		/* Total number of live processes	*/
 pid32	currpid;		/* ID of currently executing process	*/
 int deadlock;
+struct adjListNode* lockedLock;
 
 /* Memory bounds set by start.S */
 
@@ -169,8 +170,10 @@ static	void	sysinit(void)
 	prptr->prstklen = NULLSTK;
 	prptr->prstkptr = 0;
 	currpid = NULLPROC;
+
 	deadlock = 0;
 	initAdjList();
+	lockedLock = NULL;
 
 	/* Initialize semaphores */
 

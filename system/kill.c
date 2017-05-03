@@ -33,6 +33,7 @@ syscall	kill(
 
 	switch (prptr->prstate) {
 	case PR_CURR:
+		kprintf("resched called in kill: dl %d\n", deadlock);
 		prptr->prstate = PR_FREE;	/* suicide */
 		resched();
 /*
