@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 2
+#define N 6
 
 lid32	printer_lock;
 lid32	mylock[N];
@@ -46,17 +46,59 @@ void	worker(uint32 id)
 		work(id);
 		acquire(mylock[1]);
 		work(id);
+		acquire(mylock[4]);
+		work(id);
+		acquire(mylock[5]);
+		work(id);
+		release(mylock[5]);
+		release(mylock[4]);
 		release(mylock[1]);
 		release(mylock[0]);
 	}
-	else
+	else if (id == 1)
 	{
 		acquire(mylock[1]);
 		work(id);
 		acquire(mylock[0]);
 		work(id);
+		acquire(mylock[4]);
+		work(id);
+		acquire(mylock[5]);
+		work(id);
+		release(mylock[5]);
+		release(mylock[4]);
 		release(mylock[0]);
 		release(mylock[1]);
+	}
+	else if (id == 2)
+	{
+		acquire(mylock[2]);
+		work(id);
+		acquire(mylock[3]);
+		work(id);
+		acquire(mylock[5]);
+		work(id);
+		acquire(mylock[4]);
+		work(id);
+		release(mylock[4]);
+		release(mylock[5]);
+		release(mylock[3]);
+		release(mylock[2]);
+	}
+	else if (id == 3)
+	{
+		acquire(mylock[3]);
+		work(id);
+		acquire(mylock[2]);
+		work(id);
+		acquire(mylock[5]);
+		work(id);
+		acquire(mylock[4]);
+		work(id);
+		release(mylock[4]);
+		release(mylock[5]);
+		release(mylock[2]);
+		release(mylock[3]);
 	}
 }
 
@@ -69,6 +111,9 @@ int	main(uint32 argc, uint32 *argv)
 
 	ready(create((void*) worker, INITSTK, 15, "Worker 0", 1, 0), FALSE);
 	ready(create((void*) worker, INITSTK, 15, "Worker 1", 1, 1), FALSE);
+	ready(create((void*) worker, INITSTK, 15, "Worker 1", 1, 2), FALSE);
+	ready(create((void*) worker, INITSTK, 15, "Worker 1", 1, 3), FALSE);
+
 
 	return 0;
 }
