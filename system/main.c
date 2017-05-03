@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define N 5	//number of philosophers and forks
+#define N 2
 
-// locks must be declared and initialized here
-// mutex_t locks[N]; // c initializes global scope array index values to 0, FALSE is an alias to 0
-lid32 locks[N];
-lid32 print_lock; //
+lid32	printer_lock;
+lid32	mylock[N];
+
+
 /**
  * Delay for a random amount of time
  * @param alpha delay factor
@@ -22,83 +22,53 @@ void	holdup(int32 alpha)
 }
 
 /**
- * Eat for a random amount of time
+ * Work for a random amount of time
+ * @param id ID of worker
  */
-void	eat()
+void	work(uint32 id)
 {
+	acquire(printer_lock);
+	kprintf("Worker %d: Buzz buzz buzz\n", id);
+	release(printer_lock);
 	holdup(10000);
 }
 
-/**
- * Think for a random amount of time
- */
-void	think()
-{
-	holdup(1000);
-}
 
 /**
- * Philosopher's code
- * @param phil_id philosopher's id
+ * Worker code
+ * @param id ID of worker
  */
-void	philosopher(uint32 phil_id)
+void	worker(uint32 id)
 {
-	// acquire(print_lock);
-	// kprintf("size:%d", readyqueue->size);
-	// printqueue(readyqueue);
-	// release(print_lock);
-
-	srand(phil_id); //seed
-	uint32 right = (phil_id+N-1)%N; // right fork
-	uint32 left = phil_id;	//  left fork
-	int r; // declare random integer variable used for 30/70% comparison
-
-	while (TRUE)
+	if (id == 0)
 	{
-		// 70/30
-		r = rand()%10;
-		if (r<3){
-			// acquire the left fork
-			acquire(locks[left]);
-
-
-			// test the right lock, set it if its not acquired
-			if (!test_and_set(&locktab[locks[right]].lock)){
-
-				acquire(print_lock);
-				printf("Philosopher %d eating : nom nom nom\n", phil_id);
-				release(print_lock);
-
-				eat();
-
-				release(locks[right]);
-			}
-			release(locks[left]);
-
-		} else {
-
-			acquire(print_lock);
-			kprintf("Philosopher %d thinking : zzzzzZZZz\n", phil_id);
-			release(print_lock);
-
-			think();
-		} //think 70% of the time
+		acquire(mylock[0]);
+		work(id);
+		acquire(mylock[1]);
+		work(id);
+		release(mylock[1]);
+		release(mylock[0]);
+	}
+	else
+	{
+		acquire(mylock[1]);
+		work(id);
+		acquire(mylock[0]);
+		work(id);
+		release(mylock[0]);
+		release(mylock[1]);
 	}
 }
 
 int	main(uint32 argc, uint32 *argv)
 {
 	int i;
-	for(i=0;i<N;i++){
-		locks[i] = lock_create();
-	}
-	print_lock = lock_create();
+	printer_lock = lock_create();
+	for (i=0; i<N; i++)
+		mylock[i] = lock_create();
 
-	//do not change
-	ready(create((void*) philosopher, INITSTK, 10, "Ph1", 1, 0), FALSE);
-	ready(create((void*) philosopher, INITSTK, 10, "Ph2", 1, 1), FALSE);
-	ready(create((void*) philosopher, INITSTK, 10, "Ph3", 1, 2), FALSE);
-	ready(create((void*) philosopher, INITSTK, 10, "Ph4", 1, 3), FALSE);
-	ready(create((void*) philosopher, INITSTK, 10, "Ph5", 1, 4), FALSE);
+	ready(create((void*) worker, INITSTK, 15, "Worker 0", 1, 0), FALSE);
+	ready(create((void*) worker, INITSTK, 15, "Worker 1", 1, 1), FALSE);
+
 	return 0;
 }

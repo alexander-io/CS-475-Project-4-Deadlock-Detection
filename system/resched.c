@@ -18,14 +18,23 @@ void	resched(void)		// assumes interrupts are disabled
 		return;
 	}
 
+	if(deadlock >= 50){
+		intmask mask = disable();   //disable interrupts
+		deadlock_detect();
+		//other code with interrupt disabled
+		deadlock = 0;
+		restore(mask);          //reenable interrupts
+	}
+
 	// Point to process table entry for the current (old) process
 	ptold = &proctab[currpid];
-
+	// kprintf("currpid: %d\n",currpid);
 	//  check ptold's state. If it's running, put it on the ready queue and change state to ready
 	if (ptold->prstate == PR_CURR){
 		ptold->prstate = PR_READY;
 		enqueue(currpid, readyqueue, ptold->iniprprio);
 	}
+	// kprintf("dequeue\n");
 
 	// dequeue
 	pid32 id = dequeue(readyqueue);
@@ -56,7 +65,8 @@ void	resched(void)		// assumes interrupts are disabled
 			tmp = tmp->next;
 		}
 	}
-
+	// kprintf("after aging\n");
+	// printqueue(readyqueue);
 	//  set currpid to reflect new running process' PID
 	currpid = id;
 

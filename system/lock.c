@@ -85,7 +85,21 @@ syscall	lock_delete(lid32 lockid)
 		curr_entry = curr_entry->next;
 	}
 
-	//TODO (RAG) - remove all RAG edges to and from this lock
+	//(RAG) - remove all RAG edges to and from this lock
+	struct nodeList *curr_list = A->head;
+  struct adjListNode *curr_node;
+
+  // loop through the lists
+  while (curr_list!=NULL) {
+      // loop through node in list
+		if(!curr_list->headNode->isLock) {
+			removeReqEdge(curr_list->headNode->id, lockid);
+			rag_dealloc(curr_list->headNode->id, lockid);
+		}
+    curr_list = curr_list->nextList; // move to the next list
+  }
+
+
 
 	// END
 
@@ -121,7 +135,8 @@ syscall	acquire(lid32 lockid)
 	// enqueue the current process ID on the lock's wait queue
 	enqueue(currpid,locktab[lockid].wait_queue, 69); // arbitrary priority value
 
-	//TODO (RAG) - add a request edge in the RAG
+	//(RAG) - add a request edge in the RAG
+	rag_request(currpid, lockid);
 	// END
 
 	restore(mask);				//reenable interrupts
@@ -134,7 +149,8 @@ syscall	acquire(lid32 lockid)
 	mask = disable();			//disable interrupts
 
 	// START
-	//TODO (RAG) - we reache this point. Must've gotten the lock! Transform request edge to allocation edge
+	//(RAG) - we reache this point. Must've gotten the lock! Transform request edge to allocation edge
+	rag_alloc(currpid, lockid);
 	// END
 
 	restore(mask);				//reenable interrupts
@@ -169,8 +185,9 @@ syscall	release(lid32 lockid)
 
 	// unlock the mutex
 	mutex_unlock(&locktab[lockid].lock);
-	
-	//TODO (RAG) - remove allocation edge from RAG
+
+	//(RAG) - remove allocation edge from RAG
+	rag_dealloc(currpid, lockid);
 	// END
 
 	restore(mask);

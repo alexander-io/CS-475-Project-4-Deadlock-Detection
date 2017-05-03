@@ -66,3 +66,4 @@ struct procent {		/* entry in the process table		*/
 extern	struct	procent proctab[];
 extern	int32	prcount;	/* currently active processes		*/
 extern	pid32	currpid;	/* currently executing process		*/
+extern int deadlock;
