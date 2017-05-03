@@ -17,14 +17,17 @@ void	resched(void)		// assumes interrupts are disabled
 		Defer.attempt = TRUE;
 		return;
 	}
+	kprintf("res fun dead: %d", deadlock);
 
 	if(deadlock >= 50){
+		kprintf("xinusucks");
 		intmask mask = disable();   //disable interrupts
 		deadlock_detect();
 		//other code with interrupt disabled
 		deadlock = 0;
 		restore(mask);          //reenable interrupts
 	}
+	deadlock++;
 
 	// Point to process table entry for the current (old) process
 	ptold = &proctab[currpid];

@@ -181,40 +181,43 @@ void rag_alloc(int pid, int lockid) {
 
 void rag_dealloc(int pid, int lockid) {
 
+  if(A->head == NULL) {
+    kprintf("head");
+  }
+
   struct nodeList *curr_list = A->head;
   struct adjListNode *curr_node;
-
-  // loop through the lists
-  while (curr_list!=NULL) {
-    // if we've found a list with a maching headnode->id
-    if (curr_list->headNode->id == lockid && curr_list->headNode->isLock){
-
-      // set the current node to the head of the list
-      curr_node = curr_list->headNode;
-
-      // loop through node in list
-      while (curr_node->nextNode!=NULL) {
-
-        // if the next node is a match, remove the next node
-        if (curr_node->nextNode->id == pid) {
-          // this is the node we want to remove
-          struct adjListNode *remove_node = curr_node->nextNode;
-          curr_node->nextNode = NULL; // if this is the last node, set the nxt to null
-          // if there's another node down the list, link it up
-          if(remove_node->nextNode!=NULL){
-            curr_node->nextNode = remove_node->nextNode;
-          }
-          // remove_node
-          free(remove_node, sizeof(remove_node));
-          return;
-        }
-        // move on to check the next node
-        curr_node = curr_node->nextNode;
-      }
-    }
-    // move to the next list
-    curr_list = curr_list->nextList;
-  }
+  // // loop through the lists
+  // while (curr_list!=NULL) {
+  //   // if we've found a list with a maching headnode->id
+  //   if (curr_list->headNode->id == lockid && curr_list->headNode->isLock){
+  //
+  //     // set the current node to the head of the list
+  //     curr_node = curr_list->headNode;
+  //
+  //     // loop through node in list
+  //     while (curr_node->nextNode!=NULL) {
+  //
+  //       // if the next node is a match, remove the next node
+  //       if (curr_node->nextNode->id == pid) {
+  //         // this is the node we want to remove
+  //         struct adjListNode *remove_node = curr_node->nextNode;
+  //         curr_node->nextNode = NULL; // if this is the last node, set the nxt to null
+  //         // if there's another node down the list, link it up
+  //         if(remove_node->nextNode!=NULL){
+  //           curr_node->nextNode = remove_node->nextNode;
+  //         }
+  //         // remove_node
+  //         free(remove_node, sizeof(remove_node));
+  //         return;
+  //       }
+  //       // move on to check the next node
+  //       curr_node = curr_node->nextNode;
+  //     }
+  //   }
+  //   // move to the next list
+  //   curr_list = curr_list->nextList;
+  // }
 }
 
 /*

@@ -25,6 +25,7 @@ struct lockentry locktab[NLOCK];
 
 int	prcount;		/* Total number of live processes	*/
 pid32	currpid;		/* ID of currently executing process	*/
+int deadlock;
 
 /* Memory bounds set by start.S */
 
@@ -48,7 +49,6 @@ void	*maxheap;		/* highest valid memory address		*/
 void	nulluser(void)
 {
 	sysinit();
-	deadlock = 0;
 
 	kprintf("\n\r%s\n\n\r", VERSION);
 
@@ -91,7 +91,7 @@ void	nulluser(void)
 		{
 			//everytime resched() is called, it pulls the next process off the ready queue
 			resched();
-			deadlock++;
+			// kprintf("####: %d", deadlock);
 		}
 	}
 }
@@ -169,6 +169,8 @@ static	void	sysinit(void)
 	prptr->prstklen = NULLSTK;
 	prptr->prstkptr = 0;
 	currpid = NULLPROC;
+	deadlock = 0;
+	initAdjList();
 
 	/* Initialize semaphores */
 

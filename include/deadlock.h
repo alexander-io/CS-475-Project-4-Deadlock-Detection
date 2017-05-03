@@ -30,3 +30,4 @@ void printNode(int pid, int isLock);
 
 extern struct AdjList *A;
 extern struct linkedlist *whiteList, *greyList, *blackList; // helper list for deadlock detection
+extern int deadlock;
