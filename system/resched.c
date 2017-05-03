@@ -24,16 +24,16 @@ void	resched(void)		// assumes interrupts are disabled
 		kprintf("deadlock: %d\n", deadlock);
 		// kprintf("xinusucks\n");
 		intmask mask = disable();   //disable interrupts
-		lockedLock = NULL;
 		kprintf("before detect\n");
 		if(deadlock_detect()) {
+			kprintf("stop\n");
 			restartLinkedList(whiteList);
 			restartLinkedList(blackList);
 			restartLinkedList(greyList);
 			kill(deadlock_recover());
 		}
+		lockedLock = NULL;
 		kprintf("fter detect\n");
-
 
 		//other code with interrupt disabled
 		restore(mask);          //reenable interrupts

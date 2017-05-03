@@ -197,7 +197,9 @@ void rag_alloc(int pid, int lockid) {
 }
 
 
-
+/*
+* removes request and allocation edge from pid to lockid
+*/
 void rag_dealloc(int pid, int lockid) {
 
   if(A->head == NULL) {
@@ -269,7 +271,7 @@ void rag_print() {
 // detect deadlock in the graph
 void deadlock_detect(void) {
   // rag_print();
-  kprintf("called dld\n");
+  // kprintf("called dld\n");
   struct nodeList *curr_list = A->head;
 
   //add all the head nodes into a linked list
@@ -302,7 +304,7 @@ void deadlock_detect(void) {
 
 pid32 deadlock_recover() {
   struct lockentry deadLock = locktab[lockedLock->id];
-  kprintf("locked id:%d\n", lockedLock->id);
+  // kprintf("locked id:%d\n", lockedLock->id);
   // kprintf("locken", deadLock.id);
   pid32 victim;
 
@@ -319,8 +321,8 @@ pid32 deadlock_recover() {
 
         if(currNode->id == lockedLock->id && currNode->isLock) {
           victim = traversalNodeList->headNode->id;
-          kprintf("victim id:%d\n", victim);
-          kprintf("staph");
+          // kprintf("victim id:%d\n", victim);
+          // kprintf("staph");
           flag = 1;
           break;
         }
@@ -329,12 +331,12 @@ pid32 deadlock_recover() {
       if(flag) {break;}
     }
 
-    kprintf("before flag\n");
+    // kprintf("before flag\n");
     traversalNodeList = traversalNodeList->nextList;
   }
 
 
-  kprintf("prints are the best\n");
+  // kprintf("prints are the best\n");
 
   int i;
   for (i = 0; i < NLOCK; i++) {
@@ -343,9 +345,11 @@ pid32 deadlock_recover() {
 
   mutex_unlock(&deadLock.lock);
 
-  for (i = 0; i < NLOCK; i++) {
-    removeReqEdge(victim, i);
+  for (i = 0; i < 2; i++) {
+    // kprintf("before lockedid %d\n", lockedLock->id);
+    // removeReqEdge(victim, i); //TODO
     rag_dealloc(victim, i);
+    // kprintf("lockedid %d\n", lockedLock->id);
   }
   kprintf("DEADLOCK RECOVER\tkilling pid=%d to release lockid=%d\n", victim, lockedLock->id);
   return victim;
@@ -357,15 +361,24 @@ pid32 deadlock_recover() {
 * @return int/boolean, 0 : no-cycle , 1 : cycle
 */
 int recursive_deadlock_detect(struct adjListNode *dfsNode){
+  // kprintf("top of rdld\n");
   struct nodeList* traversalNodeList = getAdjList(dfsNode);
+  // kprintf("mid of rdld\n");
+  if(traversalNodeList == NULL) {
+    kprintf("if trav nodelist %d");
+    return 0;
+  }
   // kprintf("traversalNodeList id: %d\n ",traversalNodeList->headNode->id);
   struct adjListNode* currNode = traversalNodeList->headNode->nextNode;
+  // kprintf("mid as a a  of rdld\n");
+
   // kprintf("rdld before while\n");
 
   while(currNode != NULL){
     // kprintf("in while\n");
     // kprintf("currNode head %d\n", currNode->id);
     // kprintf("black list head node %d", blackList->linkHead->id);
+    // kprintf("in while dld\n");
     if(contains(currNode,blackList)) {
       // kprintf("in blackList");
     } else if(contains(currNode,greyList)) {
@@ -378,9 +391,12 @@ int recursive_deadlock_detect(struct adjListNode *dfsNode){
     } else {
       // kprintf("else in rdld\n");
       struct adjListNode* tmpNode = pull(currNode,whiteList);
+      // kprintf("justed pulled form white list\n");
       push(tmpNode->id, tmpNode->isLock,greyList);
+      // kprintf("justed pushed to grey list\n");
 
       if(recursive_deadlock_detect(currNode)){
+        // kprintf("exiting rdld\n");
         printNode(currNode->id, currNode->isLock);
         if(currNode->isLock == 1) {
           lockedLock = currNode;
@@ -391,6 +407,7 @@ int recursive_deadlock_detect(struct adjListNode *dfsNode){
     // kprintf("maybe\n");
     currNode = currNode->nextNode;
   }
+
   // kprintf("end\n");
   struct adjListNode* tmpNode = pull(dfsNode,greyList);
   push(tmpNode->id, tmpNode->isLock,blackList);
@@ -399,7 +416,7 @@ int recursive_deadlock_detect(struct adjListNode *dfsNode){
 
 struct nodeList* getAdjList(struct adjListNode* nodeToFind) {
   struct nodeList* curr_list = A->head;
-
+  // rag_print();
   while(curr_list != NULL) {
     //found the node to find as in our adj list
     if(curr_list->headNode->id == nodeToFind->id && curr_list->headNode->isLock == nodeToFind->isLock){
@@ -407,6 +424,8 @@ struct nodeList* getAdjList(struct adjListNode* nodeToFind) {
     }
     curr_list = curr_list->nextList;
   }
+  kprintf("*\n");
+  // rag_print();
   //did not find the node to find
   return NULL;
 }
@@ -505,15 +524,15 @@ void reqFind(int pid, char req, int lockid) {
   switch (req) {
     case 'R':
       rag_request(pid, lockid);
-      printf("pid=%d (R) requests lockid=%d\n", pid,lockid);
+      kprintf("pid=%d (R) requests lockid=%d\n", pid,lockid);
       break;
     case 'A':
       rag_alloc(pid, lockid);
-      printf("pid=%d (A) aquires lockid=%d\n", pid,lockid);
+      kprintf("pid=%d (A) aquires lockid=%d\n", pid,lockid);
       break;
     case 'D':
       rag_dealloc(pid, lockid);
-      printf("pid=%d (D) releases lockid=%d\n", pid,lockid);
+      kprintf("pid=%d (D) releases lockid=%d\n", pid,lockid);
       break;
   }
 }
