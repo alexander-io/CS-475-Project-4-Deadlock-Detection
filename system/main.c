@@ -43,6 +43,11 @@ void	think()
  */
 void	philosopher(uint32 phil_id)
 {
+	// acquire(print_lock);
+	// kprintf("size:%d", readyqueue->size);
+	// printqueue(readyqueue);
+	// release(print_lock);
+
 	srand(phil_id); //seed
 	uint32 right = (phil_id+N-1)%N; // right fork
 	uint32 left = phil_id;	//  left fork
@@ -55,6 +60,7 @@ void	philosopher(uint32 phil_id)
 		if (r<3){
 			// acquire the left fork
 			acquire(locks[left]);
+
 
 			// test the right lock, set it if its not acquired
 			if (!test_and_set(&locktab[locks[right]].lock)){
@@ -73,7 +79,6 @@ void	philosopher(uint32 phil_id)
 
 			acquire(print_lock);
 			kprintf("Philosopher %d thinking : zzzzzZZZz\n", phil_id);
-			printqueue(readyqueue);
 			release(print_lock);
 
 			think();
@@ -83,7 +88,6 @@ void	philosopher(uint32 phil_id)
 
 int	main(uint32 argc, uint32 *argv)
 {
-	// kprintf("hello world\n");
 	int i;
 	for(i=0;i<N;i++){
 		locks[i] = lock_create();
@@ -91,10 +95,10 @@ int	main(uint32 argc, uint32 *argv)
 	print_lock = lock_create();
 
 	//do not change
-	ready(create((void*) philosopher, INITSTK, 15, "Ph1", 1, 0), FALSE);
-	ready(create((void*) philosopher, INITSTK, 15, "Ph2", 1, 1), FALSE);
-	ready(create((void*) philosopher, INITSTK, 15, "Ph3", 1, 2), FALSE);
-	ready(create((void*) philosopher, INITSTK, 15, "Ph4", 1, 3), FALSE);
-	ready(create((void*) philosopher, INITSTK, 15, "Ph5", 1, 4), FALSE);
+	ready(create((void*) philosopher, INITSTK, 10, "Ph1", 1, 0), FALSE);
+	ready(create((void*) philosopher, INITSTK, 10, "Ph2", 1, 1), FALSE);
+	ready(create((void*) philosopher, INITSTK, 10, "Ph3", 1, 2), FALSE);
+	ready(create((void*) philosopher, INITSTK, 10, "Ph4", 1, 3), FALSE);
+	ready(create((void*) philosopher, INITSTK, 10, "Ph5", 1, 4), FALSE);
 	return 0;
 }

@@ -31,7 +31,7 @@ void	printqueue(struct queue *q)
 	while(toPrint != NULL){
 
 		// kprintf(", (pid=p%d)",toPrint->process_id);
-		// kprintf("[(pid=p%d,%d)",toPrint->process_id, toPrint->key);
+		kprintf("[(pid=p%ds,%d)",toPrint->process_id, toPrint->key);
 
 		toPrint = toPrint->next;
 	}
@@ -90,6 +90,8 @@ bool8	isfull(struct queue *q)
  */
 pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 {
+	kprintf("eq: %d", pid);
+	printqueue(readyqueue);
     // check if queue is full and if pid is illegal, and return SYSERR if either is true
 	if (isfull(q) || isbadpid(pid)){
 		kprintf("in enqueue, queue is full or is badpid\n");
@@ -101,6 +103,8 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
     // initialize the new QEntry
 	new_qentry->process_id = pid;
 	new_qentry->key = key;
+	new_qentry->next = NULL;
+	new_qentry->prev = NULL;
 
 	// insert into tail of queue
 	if(q->size == 0){
@@ -142,7 +146,11 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
 			toCompare = toCompare->next;
 		}
 	}
+
 	q->size++;
+	kprintf("eqe");
+	printqueue(readyqueue);
+
 	return pid;
 }
 
@@ -154,6 +162,8 @@ pid32 enqueue(pid32 pid, struct queue *q, int32 key)
  */
 pid32 dequeue(struct queue *q)
 {
+	kprintf("dq %d", q->head->process_id);
+	printqueue(q);
     // return EMPTY if queue is empty
 	if (isempty(q)){
 		kprintf("queue is empty, return -1\n");
@@ -177,6 +187,8 @@ pid32 dequeue(struct queue *q)
     // free up the space on the heap
 	free(old_head, sizeof(old_head));
 	q->size--;
+	kprintf("dq");
+	printqueue(q);
 	return return_pid;
 }
 
@@ -261,6 +273,9 @@ pid32	getlast(struct queue *q)
  */
 pid32	remove(pid32 pid, struct queue *q)
 {
+	kprintf("rm %d", pid);
+	printqueue(readyqueue);
+
 	//return EMPTY if queue is empty
 	if (isempty(q)){
 		return EMPTY;
@@ -293,5 +308,8 @@ pid32	remove(pid32 pid, struct queue *q)
 		}
 	}
 	//if pid does not exist in the queue, return SYSERR
+	kprintf("rm");
+	printqueue(readyqueue);
+
 	return SYSERR;
 }
